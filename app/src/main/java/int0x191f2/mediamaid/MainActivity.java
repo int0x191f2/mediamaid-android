@@ -32,100 +32,48 @@ public class MainActivity extends Activity {
     static String PREFERENCE_NAME = "twitter_oauth";
     static final String PREF_KEY_OAUTH_TOKEN = "oauth_token";
     static final String PREF_KEY_OAUTH_SECRET = "oauth_token_secret";
-    static final String PREF_KEY_TWITTER_LOGIN = "isTwitterLogedIn";
-    static final String TWITTER_CALLBACK_URL = "oauth://t4jsample";
-    static final String URL_TWITTER_AUTH = "auth_url";
-    static final String URL_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
-    static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
+    static final String PREF_KEY_TWITTER_LOGIN = "isTwitterLoggedIn";
     private static SharedPreferences sp;
     private static ConnectionDetector cd;
-    private static RequestToken requestToken;
+    private AccessToken accessToken;
+    private int0x191f2.mediamaid.TwitterAuth twitterAuth;
 
     public void submitTweet(View view) {
         new TwitterSendTweet().execute(((EditText) findViewById(R.id.tweetInput)).getText().toString());
     }
 
-    public void twitterAuth(View view) {
-        if (!isTwitterLoggedInAlready()) {
-            Uri uri = getIntent().getData();
-            if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {
-                // oAuth verifier
-                String verifier = uri.getQueryParameter(URL_TWITTER_OAUTH_VERIFIER);
-
-                try {
-                    // Get the access token
-                    AccessToken accessToken = twatter.getOAuthAccessToken(requestToken, verifier);
-
-                    // Shared Preferences
-                    SharedPreferences.Editor e = sp.edit();
-
-                    // After getting access token, access token secret
-                    // store them in application preferences
-                    e.putString(PREF_KEY_OAUTH_TOKEN, accessToken.getToken());
-                    e.putString(PREF_KEY_OAUTH_SECRET, accessToken.getTokenSecret());
-                    // Store login status - true
-                    e.putBoolean(PREF_KEY_TWITTER_LOGIN, true);
-                    e.commit(); // save changes
-
-                    Log.e("Twitter OAuth Token", "> " + accessToken.getToken());
-
-                    // Getting user details from twitter
-                    // For now i am getting his name only
-                    long userID = accessToken.getUserId();
-                    User user = twatter.showUser(userID);
-                    String username = user.getName();
-                } catch (Exception e) {
-                    // Check log for login errors
-                    Log.e("Twitter Login Error", "> " + e.getMessage());
-                }
-            }
-
+    public void getRequestToken(View view) {
+        //Log.e("MediaMaid", twitterAuth.getOAuthRequestToken().getAuthorizationURL());
+        if(twitterAuth.getOAuthRequestToken()==null){
+            Toast.makeText(getApplicationContext(),"requestToken is null!",Toast.LENGTH_SHORT).show();
         }
+        try {
+            Log.e("MediaMaid","oh crap/s");
+            this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(twitterAuth.getOAuthRequestToken().getAuthorizationURL())));
 
-
-    }
-
-    /**
-     * Function to login twitter
-     * */
-    private void loginToTwitter() {
-        // Check if already logged in
-        if (!isTwitterLoggedInAlready()) {
-            ConfigurationBuilder builder = new ConfigurationBuilder();
-            builder.setOAuthConsumerKey(TWITTER_CONSUMER_KEY);
-            builder.setOAuthConsumerSecret(TWITTER_CONSUMER_SECRET);
-            Configuration configuration = builder.build();
-
-            TwitterFactory factory = new TwitterFactory(configuration);
-            twatter = factory.getInstance();
-
-            try {
-                requestToken = twatter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
-                this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(requestToken.getAuthenticationURL())));
-            } catch (TwitterException e) {
-                e.printStackTrace();
-            }
-        } else {
-            // user already logged into twitter
-            Toast.makeText(getApplicationContext(), "Already Logged into twitter", Toast.LENGTH_LONG).show();
+        }catch(Exception e){
+            Log.e("MediaMaid",e.toString());
         }
     }
-
-    /**
-     * Check user already logged in your application using twitter Login flag is
-     * fetched from Shared Preferences
-     * */
-    private boolean isTwitterLoggedInAlready() {
-        // return twitter login status from Shared Preferences
-        return sp.getBoolean(PREF_KEY_TWITTER_LOGIN, false);
+    public void getAccessToken(View view) {
+        accessToken = twitterAuth.getOAuthAccessToken(((EditText) (findViewById(R.id.pinInput))).getText().toString());
+        if(accessToken==null){
+            Toast.makeText(getApplicationContext(),"Problems athenticating with Twitter",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getApplicationContext(),"Successfully authenticated with Twitter",Toast.LENGTH_SHORT).show();
+        }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        cd = new ConnectionDetector(getApplicationContext());
         if (!cd.isConnectingToInternet()){
             Toast.makeText(getApplicationContext(),"No Internet Connection Detected",Toast.LENGTH_SHORT).show();
         }
+        twitterAuth = new int0x191f2.mediamaid.TwitterAuth(getApplicationContext(),TWITTER_CONSUMER_KEY,TWITTER_CONSUMER_SECRET);
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
     }
 
@@ -174,13 +122,13 @@ public class MainActivity extends Activity {
         Twitter twatter;
         ConfigurationBuilder cb = new ConfigurationBuilder();
         TwitterFactory tf;
-        protected String doInBackground(String... strang){
+        protected String doInBackground(String... params){
             cb.setDebugEnabled(true);
             cb.setOAuthConsumerKey("4dKIk0KoiLRb91DjbES3nfdy5");
             cb.setOAuthConsumerSecret("OJhxMo8lk2N801KxG6e3Nyszx6kUQEsezrX4cFCi2IRtRgotY9");
-            cb.setOAuthAccessToken("2764831833-lbt8G9In5OejzX2kBd6N3gx4k1x1p94FGEEuawf");
-            cb.setOAuthAccessTokenSecret("VpHI16z3XW6vRxHsJylXzcF1w6TTkmz9LNh47ivbjxH2g");
-            String tweetToSubmit = strang[0];
+            cb.setOAuthAccessToken(sp.getString("accessToken",""));
+            cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret",""));
+            String tweetToSubmit = params[0];
             tf = new TwitterFactory(cb.build());
             twatter = tf.getInstance();
             try {

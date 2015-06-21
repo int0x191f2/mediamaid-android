@@ -24,5 +24,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:onClick="twitterAuth"/>
+        android:onClick="getRequestToken"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+            <EditText android:id="@+id/pinInput"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/pin_input" />
+            <Button android:id="@+id/pinSubmit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pin_submit"
+                android:onClick="getAccessToken"/>
+    </LinearLayout>
+
 </LinearLayout>

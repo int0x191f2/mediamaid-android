@@ -4,5 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="tweet_input">Enter your tweet here</string>
+    <string name="pin_input">Enter your PIN here</string>
+    <string name="pin_submit">Submit Pin</string>
     <string name="tweet_send">Tweet!</string>
 </resources>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MediaMaid</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="tweet_input">Enter your tweet here</string>
+    <string name="tweet_send">Tweet!</string>
+</resources>

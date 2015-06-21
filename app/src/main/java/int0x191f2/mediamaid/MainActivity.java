@@ -2,6 +2,7 @@ package int0x191f2.mediamaid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
@@ -31,6 +32,8 @@ public class MainActivity extends Activity {
     static final String URL_TWITTER_AUTH = "auth_url";
     static final String URL_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
     static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
+    private static SharedPreferences sp;
+    private static ConnectionDetector cd;
 
     public void submitTweet(View view) {
         new TwitterSendTweet().execute(((EditText) findViewById(R.id.tweetInput)).getText().toString());
@@ -40,6 +43,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (!cd.isConnectingToInternet()){
+            Toast.makeText(getApplicationContext(),"No Internet Connection Detected",Toast.LENGTH_SHORT).show();
+        }
+        sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
     }
 
     @Override
@@ -118,6 +125,11 @@ public class MainActivity extends Activity {
         @Override
         protected String doInBackground(String... params) {
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
         }
     }
 }

@@ -3,10 +3,12 @@ package int0x191f2.mediamaid;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +17,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import twitter4j.*;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
 
@@ -34,11 +39,86 @@ public class MainActivity extends Activity {
     static final String URL_TWITTER_OAUTH_TOKEN = "oauth_token";
     private static SharedPreferences sp;
     private static ConnectionDetector cd;
+    private static RequestToken requestToken;
 
     public void submitTweet(View view) {
         new TwitterSendTweet().execute(((EditText) findViewById(R.id.tweetInput)).getText().toString());
     }
 
+    public void twitterAuth(View view) {
+        if (!isTwitterLoggedInAlready()) {
+            Uri uri = getIntent().getData();
+            if (uri != null && uri.toString().startsWith(TWITTER_CALLBACK_URL)) {
+                // oAuth verifier
+                String verifier = uri.getQueryParameter(URL_TWITTER_OAUTH_VERIFIER);
+
+                try {
+                    // Get the access token
+                    AccessToken accessToken = twatter.getOAuthAccessToken(requestToken, verifier);
+
+                    // Shared Preferences
+                    SharedPreferences.Editor e = sp.edit();
+
+                    // After getting access token, access token secret
+                    // store them in application preferences
+                    e.putString(PREF_KEY_OAUTH_TOKEN, accessToken.getToken());
+                    e.putString(PREF_KEY_OAUTH_SECRET, accessToken.getTokenSecret());
+                    // Store login status - true
+                    e.putBoolean(PREF_KEY_TWITTER_LOGIN, true);
+                    e.commit(); // save changes
+
+                    Log.e("Twitter OAuth Token", "> " + accessToken.getToken());
+
+                    // Getting user details from twitter
+                    // For now i am getting his name only
+                    long userID = accessToken.getUserId();
+                    User user = twatter.showUser(userID);
+                    String username = user.getName();
+                } catch (Exception e) {
+                    // Check log for login errors
+                    Log.e("Twitter Login Error", "> " + e.getMessage());
+                }
+            }
+
+        }
+
+
+    }
+
+    /**
+     * Function to login twitter
+     * */
+    private void loginToTwitter() {
+        // Check if already logged in
+        if (!isTwitterLoggedInAlready()) {
+            ConfigurationBuilder builder = new ConfigurationBuilder();
+            builder.setOAuthConsumerKey(TWITTER_CONSUMER_KEY);
+            builder.setOAuthConsumerSecret(TWITTER_CONSUMER_SECRET);
+            Configuration configuration = builder.build();
+
+            TwitterFactory factory = new TwitterFactory(configuration);
+            twatter = factory.getInstance();
+
+            try {
+                requestToken = twatter.getOAuthRequestToken(TWITTER_CALLBACK_URL);
+                this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(requestToken.getAuthenticationURL())));
+            } catch (TwitterException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // user already logged into twitter
+            Toast.makeText(getApplicationContext(), "Already Logged into twitter", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Check user already logged in your application using twitter Login flag is
+     * fetched from Shared Preferences
+     * */
+    private boolean isTwitterLoggedInAlready() {
+        // return twitter login status from Shared Preferences
+        return sp.getBoolean(PREF_KEY_TWITTER_LOGIN, false);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -1,8 +1,11 @@
 package int0x191f2.mediamaid;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -25,18 +28,22 @@ public class TwitterAuth {
     static final String TWITTER_CALLBACK_URL = "http://www.google.com";
     private static SharedPreferences prefs;
     private Boolean isKeysSet=false;
+    private Boolean isKeysGenerated=false;
     private RequestToken requestToken;
     private AccessToken accessToken;
     private ConfigurationBuilder cb = new ConfigurationBuilder();
     private Twitter twatter;
-    public TwitterAuth(Context context,String CONSUMER_KEY, String CONSUMER_SECRET){
+    private Activity act;
+    private Context context;
+    public TwitterAuth(Context c,String CONSUMER_KEY, String CONSUMER_SECRET){
         try {
             cb.setOAuthConsumerKey(CONSUMER_KEY);
             cb.setOAuthConsumerSecret(CONSUMER_SECRET);
             Configuration config = cb.build();
             TwitterFactory fact = new TwitterFactory(config);
             twatter = fact.getInstance();
-            prefs = context.getSharedPreferences("MediaMaid",0);
+            prefs = c.getSharedPreferences("MediaMaid",0);
+            context = c;
             isKeysSet=true;
         }catch(Exception e){
             Log.e("MediaMaid","Error Authenticating with Twitter"+e.toString());
@@ -44,17 +51,10 @@ public class TwitterAuth {
         }
     }
     public RequestToken getOAuthRequestToken(){
-        if(requestToken!=null){
-            return requestToken;
-        }
-        try {
-            requestToken = twatter.getOAuthRequestToken();
-            Log.e("MediaMaid", requestToken.toString());
-            return requestToken;
-        } catch (Exception e) {
-            Log.e("MediaMaid", "Error creating requestToken"+e.toString());
-            return requestToken;
-        }
+        return requestToken;
+    }
+    public void generateOAuthRequestToken(){
+        new GenerateAccessToken().execute(requestToken);
     }
     public AccessToken getOAuthAccessToken(String pin){
         try{
@@ -69,6 +69,26 @@ public class TwitterAuth {
         }catch(Exception e){
             Log.e("MediaMaid","Failed to get accessToken"+e.toString());
             return accessToken;
+        }
+    }
+    public class GenerateAccessToken extends AsyncTask<RequestToken, Integer, RequestToken>{
+        @Override
+        protected RequestToken doInBackground(RequestToken... params) {
+            RequestToken rt = params[0];
+            try {
+                rt = twatter.getOAuthRequestToken();
+                Log.i("MediaMaid", rt.toString());
+                return rt;
+            } catch (Exception e) {
+                Log.e("MediaMaid", "Error creating rt"+e.toString());
+                return rt;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(RequestToken s) {
+            requestToken = s;
+            super.onPostExecute(s);
         }
     }
 }

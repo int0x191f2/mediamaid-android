@@ -1,6 +1,7 @@
 package int0x191f2.mediamaid;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -43,16 +44,10 @@ public class MainActivity extends Activity {
     }
 
     public void getRequestToken(View view) {
-        //Log.e("MediaMaid", twitterAuth.getOAuthRequestToken().getAuthorizationURL());
-        if(twitterAuth.getOAuthRequestToken()==null){
-            Toast.makeText(getApplicationContext(),"requestToken is null!",Toast.LENGTH_SHORT).show();
-        }
-        try {
-            Log.e("MediaMaid","oh crap/s");
+        try{
             this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(twitterAuth.getOAuthRequestToken().getAuthorizationURL())));
-
         }catch(Exception e){
-            Log.e("MediaMaid",e.toString());
+            Toast.makeText(getApplicationContext(),"Problems logging in. Check your internet connection",Toast.LENGTH_SHORT).show();
         }
     }
     public void getAccessToken(View view) {
@@ -73,7 +68,9 @@ public class MainActivity extends Activity {
         if (!cd.isConnectingToInternet()){
             Toast.makeText(getApplicationContext(),"No Internet Connection Detected",Toast.LENGTH_SHORT).show();
         }
+        //Create the Twitter Authenticator
         twitterAuth = new int0x191f2.mediamaid.TwitterAuth(getApplicationContext(),TWITTER_CONSUMER_KEY,TWITTER_CONSUMER_SECRET);
+        twitterAuth.generateOAuthRequestToken();
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
     }
 

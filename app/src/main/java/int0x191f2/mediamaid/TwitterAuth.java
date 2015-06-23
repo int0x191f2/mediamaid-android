@@ -15,6 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.util.AbstractCollection;
+
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
@@ -30,7 +33,7 @@ public class TwitterAuth {
     private Boolean isKeysSet=false;
     private Boolean isKeysGenerated=false;
     private RequestToken requestToken;
-    private AccessToken accessToken;
+    private AccessToken accessToken,a;
     private ConfigurationBuilder cb = new ConfigurationBuilder();
     private Twitter twatter;
     private Activity act;
@@ -54,24 +57,19 @@ public class TwitterAuth {
         return requestToken;
     }
     public void generateOAuthRequestToken(){
-        new GenerateAccessToken().execute(requestToken);
+        new GenerateRequestToken().execute(requestToken);
     }
-    public AccessToken getOAuthAccessToken(String pin){
-        try{
-            Log.e("MediaMaid","Pin:"+pin);
-            accessToken = twatter.getOAuthAccessToken(requestToken,pin);
-            SharedPreferences.Editor e = prefs.edit();
-            e.putString("accessToken",accessToken.getToken());
-            e.putString("accessTokenSecret",accessToken.getTokenSecret());
-            e.putBoolean("loggedIn",true);
-            e.commit();
-            return accessToken;
-        }catch(Exception e){
-            Log.e("MediaMaid","Failed to get accessToken"+e.toString());
-            return accessToken;
+    public void generateOAuthAccessToken(String pin){
+        new GenerateAccessToken().execute(pin);
+    }
+    public void checkOAuthAccessToken(){
+        if(accessToken==null){
+            Toast.makeText(context,"Error logging into Twitter",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context,"Successfully logged into Twitter", Toast.LENGTH_SHORT).show();
         }
     }
-    public class GenerateAccessToken extends AsyncTask<RequestToken, Integer, RequestToken>{
+    public class GenerateRequestToken extends AsyncTask<RequestToken, Integer, RequestToken>{
         @Override
         protected RequestToken doInBackground(RequestToken... params) {
             RequestToken rt = params[0];
@@ -88,6 +86,31 @@ public class TwitterAuth {
         @Override
         protected void onPostExecute(RequestToken s) {
             requestToken = s;
+            super.onPostExecute(s);
+        }
+    }
+    public class GenerateAccessToken extends AsyncTask<String, Integer, String>{
+        @Override
+        protected String doInBackground(String... params) {
+            String s = params[0];
+            try{
+                Log.e("MediaMaid","Pin:"+s);
+                accessToken = twatter.getOAuthAccessToken(requestToken,s);
+                SharedPreferences.Editor e = prefs.edit();
+                e.putString("accessToken",accessToken.getToken());
+                e.putString("accessTokenSecret",accessToken.getTokenSecret());
+                e.putBoolean("loggedIn",true);
+                e.commit();
+                return s;
+            }catch(Exception e){
+                Log.e("MediaMaid","Failed to get accessToken"+e.toString());
+                return s;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            checkOAuthAccessToken();
             super.onPostExecute(s);
         }
     }

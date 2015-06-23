@@ -51,12 +51,7 @@ public class MainActivity extends Activity {
         }
     }
     public void getAccessToken(View view) {
-        accessToken = twitterAuth.getOAuthAccessToken(((EditText) (findViewById(R.id.pinInput))).getText().toString());
-        if(accessToken==null){
-            Toast.makeText(getApplicationContext(),"Problems athenticating with Twitter",Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(getApplicationContext(),"Successfully authenticated with Twitter",Toast.LENGTH_SHORT).show();
-        }
+        twitterAuth.generateOAuthAccessToken(((EditText) (findViewById(R.id.pinInput))).getText().toString());
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,13 +111,13 @@ public class MainActivity extends Activity {
 
 
     public class TwitterSendTweet extends AsyncTask<String,Integer,String> {
-        Twitter twatter;
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        TwitterFactory tf;
         protected String doInBackground(String... params){
+            Twitter twatter;
+            ConfigurationBuilder cb = new ConfigurationBuilder();
+            TwitterFactory tf;
             cb.setDebugEnabled(true);
-            cb.setOAuthConsumerKey("4dKIk0KoiLRb91DjbES3nfdy5");
-            cb.setOAuthConsumerSecret("OJhxMo8lk2N801KxG6e3Nyszx6kUQEsezrX4cFCi2IRtRgotY9");
+            cb.setOAuthConsumerKey(TWITTER_CONSUMER_KEY);
+            cb.setOAuthConsumerSecret(TWITTER_CONSUMER_SECRET);
             cb.setOAuthAccessToken(sp.getString("accessToken",""));
             cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret",""));
             String tweetToSubmit = params[0];
@@ -144,17 +139,6 @@ public class MainActivity extends Activity {
             }else{
                 Toast.makeText(getApplicationContext(),result.toUpperCase(),Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-    public class TwitterAuth extends AsyncTask <String,Integer,String> {
-        @Override
-        protected String doInBackground(String... params) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
         }
     }
 }

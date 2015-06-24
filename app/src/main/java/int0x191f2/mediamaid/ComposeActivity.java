@@ -43,11 +43,15 @@ public class ComposeActivity extends AppCompatActivity {
         }
         if (id == R.id.sendMessage) {
             Boolean didSend = twitterTweeter.Send(((EditText)(findViewById(R.id.composeMessageInput))).getText().toString());
-            if(didSend){
-                finish();
-                Toast.makeText(getApplicationContext(),"Tweet sent successfully",Toast.LENGTH_SHORT).show();
+            if(!(((EditText)(findViewById(R.id.composeMessageInput))).getText().toString().isEmpty())) {
+                if (didSend) {
+                    finish();
+                    Toast.makeText(getApplicationContext(), "Tweet sent successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Error sending tweet", Toast.LENGTH_SHORT).show();
+                }
             }else{
-                Toast.makeText(getApplicationContext(),"Error sending tweet",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Input a message",Toast.LENGTH_SHORT).show();
             }
         }
 

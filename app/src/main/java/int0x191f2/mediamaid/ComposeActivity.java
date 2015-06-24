@@ -54,7 +54,6 @@ public class ComposeActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"Input a message",Toast.LENGTH_SHORT).show();
             }
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

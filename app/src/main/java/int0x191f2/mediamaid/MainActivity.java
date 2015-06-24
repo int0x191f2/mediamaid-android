@@ -34,7 +34,7 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     Twitter twatter;
     ConfigurationBuilder cb = new ConfigurationBuilder();
     TwitterFactory tf;
@@ -78,6 +78,15 @@ public class MainActivity extends Activity {
         //Create the Twitter Authenticator
         twitterAuth = new int0x191f2.mediamaid.TwitterAuth(getApplicationContext(),TWITTER_CONSUMER_KEY,TWITTER_CONSUMER_SECRET);
         twitterAuth.generateOAuthRequestToken();
+        //Set the toolbar title
+        Toolbar tb = (Toolbar) findViewById(R.id.mainToolbar);
+        tb.setTitleTextColor(0xFFFFFFFF);
+        if(tb!=null){
+            setSupportActionBar(tb);
+        }
+        getSupportActionBar().setTitle("MediaMaid");
+        //Disable back button in top level of application
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
     }
 
@@ -97,6 +106,7 @@ public class MainActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Toast.makeText(getApplicationContext(),"TEST",Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);

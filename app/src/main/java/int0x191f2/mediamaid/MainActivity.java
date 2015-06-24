@@ -7,7 +7,17 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.ActionBarActivity;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -38,9 +48,11 @@ public class MainActivity extends Activity {
     private static ConnectionDetector cd;
     private AccessToken accessToken;
     private int0x191f2.mediamaid.TwitterAuth twitterAuth;
+    FloatingActionButton fab;
+    Toolbar toolbar;
 
-    public void submitTweet(View view) {
-        new TwitterSendTweet().execute(((EditText) findViewById(R.id.tweetInput)).getText().toString());
+    public void composeDialog(View view) {
+        startActivity(new Intent(this,ComposeActivity.class));
     }
 
     public void getRequestToken(View view) {
@@ -51,7 +63,7 @@ public class MainActivity extends Activity {
         }
     }
     public void getAccessToken(View view) {
-        twitterAuth.generateOAuthAccessToken(((EditText) (findViewById(R.id.pinInput))).getText().toString());
+        //twitterAuth.generateOAuthAccessToken(((EditText) (findViewById(R.id.pinInput))).getText().toString());
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,58 +99,6 @@ public class MainActivity extends Activity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public class TwitterSendTweet extends AsyncTask<String,Integer,String> {
-        protected String doInBackground(String... params){
-            Twitter twatter;
-            ConfigurationBuilder cb = new ConfigurationBuilder();
-            TwitterFactory tf;
-            cb.setDebugEnabled(true);
-            cb.setOAuthConsumerKey(TWITTER_CONSUMER_KEY);
-            cb.setOAuthConsumerSecret(TWITTER_CONSUMER_SECRET);
-            cb.setOAuthAccessToken(sp.getString("accessToken",""));
-            cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret",""));
-            String tweetToSubmit = params[0];
-            tf = new TwitterFactory(cb.build());
-            twatter = tf.getInstance();
-            try {
-                twatter.updateStatus(tweetToSubmit);
-                Log.i("MediaMaid", "Sending tweet " + tweetToSubmit);
-                return "42";
-            } catch (Exception e) {
-                Log.e("MediaMaid",e.toString());
-                return e.toString();
-            }
-        }
-        protected void onPostExecute(String result){
-            if(result.equals("42")){
-                Toast.makeText(getApplicationContext(),"Tweeted",Toast.LENGTH_SHORT).show();
-                ((EditText) findViewById(R.id.tweetInput)).setText("");
-            }else{
-                Toast.makeText(getApplicationContext(),result.toUpperCase(),Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 }

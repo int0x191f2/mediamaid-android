@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="int0x191f2.mediamaid.ComposeActivity">
+    <!--<item android:id="@+id/action_settings" android:title="@string/action_settings"-->
+        <!--android:orderInCategory="100" app:showAsAction="never" />-->
+    <item android:id="@+id/sendMessage"
+        android:orderInCategory="101"
+        android:title="@string/sendMessage"
+        android:icon="@drawable/ic_send_message"
+        app:showAsAction="always"/>
+</menu>

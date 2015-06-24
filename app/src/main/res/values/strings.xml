@@ -7,4 +7,7 @@
     <string name="pin_input">Enter your PIN here</string>
     <string name="pin_submit">Submit Pin</string>
     <string name="tweet_send">Tweet!</string>
+    <string name="title_activity_compose">ComposeActivity</string>
+    <string name="sendMessage">Send current message</string>
+    <string name="back">Back</string>
 </resources>

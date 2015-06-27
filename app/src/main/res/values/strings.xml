@@ -10,4 +10,5 @@
     <string name="title_activity_compose">ComposeActivity</string>
     <string name="sendMessage">Send current message</string>
     <string name="back">Back</string>
+    <string name="title_activity_settings">settings</string>
 </resources>

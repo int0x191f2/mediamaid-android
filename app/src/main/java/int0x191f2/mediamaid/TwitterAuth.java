@@ -78,7 +78,7 @@ public class TwitterAuth {
         protected String doInBackground(String... params) {
             String s = params[0];
             try{
-                Log.e("MediaMaid","Pin:"+s);
+                Log.i("MediaMaid","Access Token Pin:"+s);
                 accessToken = twatter.getOAuthAccessToken(requestToken,s);
                 SharedPreferences.Editor e = prefs.edit();
                 e.putString("accessToken",accessToken.getToken());

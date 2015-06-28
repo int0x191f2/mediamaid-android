@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private static ConnectionDetector cd;
     private AccessToken accessToken;
     private int0x191f2.mediamaid.TwitterAuth twitterAuth;
+    private DrawerLayout mDrawer;
+    private ActionBarDrawerToggle mToggle;
     FloatingActionButton fab;
     Toolbar toolbar;
 
@@ -67,9 +71,18 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("MediaMaid");
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawerLayout);
+        mToggle = new ActionBarDrawerToggle(this,mDrawer,tb,R.string.drawer_open, R.string.drawer_close);
+        mToggle.setDrawerIndicatorEnabled(true);
+        mDrawer.setDrawerListener(mToggle);
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
     }
-
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState)
+    {
+        super.onPostCreate(savedInstanceState);
+        mToggle.syncState();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

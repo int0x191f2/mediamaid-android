@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerListView = (ListView) findViewById(R.id.navDrawer);
         drawerListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
+        drawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
@@ -112,5 +114,19 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id){
+            navigationDrawerItem(position);
+        }
+    }
+
+    private void navigationDrawerItem(int position) {
+        //Login button
+        if(position==0){
+            startActivity(new Intent(this,TwitterLoginActivity.class));
+        }
     }
 }

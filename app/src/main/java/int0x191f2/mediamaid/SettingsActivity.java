@@ -1,16 +1,32 @@
 package int0x191f2.mediamaid;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
 
-public class settings extends AppCompatActivity {
+import twitter4j.auth.AccessToken;
+
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        Toolbar tb = (Toolbar) findViewById(R.id.settingsToolbar);
+        tb.setTitleTextColor(0xFFFFFFFF);
+        if(tb!=null){
+            setSupportActionBar(tb);
+        }
+        getSupportActionBar().setTitle("Settings");
+        //Enable back button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

@@ -10,5 +10,8 @@
     <string name="title_activity_compose">ComposeActivity</string>
     <string name="sendMessage">Send current message</string>
     <string name="back">Back</string>
+    <string name="drawer_open">The drawer is open</string>
+    <string name="drawer_close">The drawer is closed</string>
     <string name="title_activity_settings">settings</string>
+    <string name="title_activity_twitter_login">TwitterLoginActivity</string>
 </resources>

@@ -3,12 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="int0x191f2.mediamaid.settings">
+    tools:context="int0x191f2.mediamaid.SettingsActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/settingsToolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        android:paddingTop="24dp"
         android:background="?attr/colorPrimary"/>
 
 </LinearLayout>

@@ -4,17 +4,25 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="int0x191f2.mediamaid.ComposeActivity">
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/composeToolbar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/composeToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:paddingTop="24dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark" />
 
-    <EditText
-        android:id="@+id/composeMessageInput"
-        android:layout_width="match_parent"
-        android:layout_height="250px"
-        android:inputType="textMultiLine"
-        android:gravity="left|top"/>
+        <EditText
+            android:id="@+id/composeMessageInput"
+            android:layout_width="match_parent"
+            android:layout_height="250px"
+            android:inputType="textMultiLine"
+            android:gravity="left|top"/>
+
+    </LinearLayout>
+
 </LinearLayout>

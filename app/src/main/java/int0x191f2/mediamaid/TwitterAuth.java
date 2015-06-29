@@ -28,11 +28,10 @@ import twitter4j.conf.ConfigurationBuilder;
  * Created by Adam on 6/18/2015.
  */
 public class TwitterAuth {
-    static final String TWITTER_CALLBACK_URL = "http://www.google.com";
     private static SharedPreferences prefs;
     private Boolean isKeysSet=false;
     private Boolean isKeysGenerated=false;
-    private RequestToken requestToken;
+    public RequestToken requestToken;
     private AccessToken accessToken,a;
     private ConfigurationBuilder cb = new ConfigurationBuilder();
     private Twitter twatter;
@@ -57,7 +56,12 @@ public class TwitterAuth {
         return requestToken;
     }
     public void generateOAuthRequestToken(){
-        new GenerateRequestToken().execute(requestToken);
+        try {
+            requestToken = twatter.getOAuthRequestToken();
+            Log.i("MediaMaid", requestToken.toString());
+        } catch (Exception e) {
+            Log.e("MediaMaid", "Error creating requestToken"+e.toString());
+        }
     }
     public void generateOAuthAccessToken(String pin){
         new GenerateAccessToken().execute(pin);
@@ -69,32 +73,12 @@ public class TwitterAuth {
             Toast.makeText(context,"Successfully logged into Twitter", Toast.LENGTH_SHORT).show();
         }
     }
-    public class GenerateRequestToken extends AsyncTask<RequestToken, Integer, RequestToken>{
-        @Override
-        protected RequestToken doInBackground(RequestToken... params) {
-            RequestToken rt = params[0];
-            try {
-                rt = twatter.getOAuthRequestToken();
-                Log.i("MediaMaid", rt.toString());
-                return rt;
-            } catch (Exception e) {
-                Log.e("MediaMaid", "Error creating rt"+e.toString());
-                return rt;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(RequestToken s) {
-            requestToken = s;
-            super.onPostExecute(s);
-        }
-    }
     public class GenerateAccessToken extends AsyncTask<String, Integer, String>{
         @Override
         protected String doInBackground(String... params) {
             String s = params[0];
             try{
-                Log.e("MediaMaid","Pin:"+s);
+                Log.i("MediaMaid","Access Token Pin:"+s);
                 accessToken = twatter.getOAuthAccessToken(requestToken,s);
                 SharedPreferences.Editor e = prefs.edit();
                 e.putString("accessToken",accessToken.getToken());

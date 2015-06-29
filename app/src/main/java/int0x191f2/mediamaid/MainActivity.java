@@ -17,7 +17,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+import java.util.List;
+import android.util.Log;
+
+import org.w3c.dom.Text;
 
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
@@ -45,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private String[] drawerItems = {"Login"};
     private DrawerLayout mDrawer;
     private ActionBarDrawerToggle mToggle;
+    private TwitterTimelineHandler timelineHandler;
     public void composeDialog(View view) {
         startActivity(new Intent(this,ComposeActivity.class));
     }
@@ -68,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //Create the Twitter Authenticator
         twitterAuth = new int0x191f2.mediamaid.TwitterAuth(getApplicationContext(),TWITTER_CONSUMER_KEY,TWITTER_CONSUMER_SECRET);
+        //Create the timelineHandler
+        timelineHandler = new TwitterTimelineHandler(getApplicationContext());
         //Set the toolbar title and color
         Toolbar tb = (Toolbar) findViewById(R.id.mainToolbar);
         tb.setTitleTextColor(0xFFFFFFFF);
@@ -75,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             setSupportActionBar(tb);
         }
         getSupportActionBar().setTitle("MediaMaid");
+
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         mDrawer = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -83,10 +92,20 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.setDrawerListener(mToggle);
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
 
+        //Drawer list and action handling
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerListView = (ListView) findViewById(R.id.navDrawer);
         drawerListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
         drawerListView.setOnItemClickListener(new DrawerItemClickListener());
+
+        //Temporary
+        TextView tv = (TextView) findViewById(R.id.tweetsTextView);
+        List<Status> statusList = timelineHandler.getTimeline();
+        for (Status status : statusList) {
+            Log.i("MediaMaid",status.getUser().getName() + ":" +
+                    status.getText());
+            tv.setText(tv.getText()+"\n"+status.getUser().getName() + ":" + status.getText());
+        }
     }
     @Override
     protected void onPostCreate(Bundle savedInstanceState)

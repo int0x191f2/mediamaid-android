@@ -3,15 +3,24 @@
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="false"
+    android:id="@+id/drawerLayout"
+    android:elevation="7dp"
+    >
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <android.support.v7.widget.Toolbar
+        android:layout_height="match_parent"
+        android:clickable="true"
+        >
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/mainToolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"/>
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:paddingTop="24dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:elevation="4dp"
+            />
         <com.melnykov.fab.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
@@ -26,6 +35,7 @@
     <ListView android:id="@+id/navDrawer"
         android:layout_width="240dp"
         android:layout_height="match_parent"
+        android:paddingTop="24dp"
         android:layout_gravity="start"
         android:choiceMode="singleChoice"
         android:divider="@android:color/transparent"

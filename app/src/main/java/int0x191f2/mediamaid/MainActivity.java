@@ -24,7 +24,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import twitter4j.*;
@@ -48,8 +50,12 @@ public class MainActivity extends AppCompatActivity {
     private static ConnectionDetector cd;
     private AccessToken accessToken;
     private int0x191f2.mediamaid.TwitterAuth twitterAuth;
-    FloatingActionButton fab;
-    Toolbar toolbar;
+    private FloatingActionButton fab;
+    private Toolbar toolbar;
+
+    private DrawerLayout drawerLayout;
+    private ListView drawerListView;
+    private String[] drawerItems = {"Login"};
 
     public void composeDialog(View view) {
         startActivity(new Intent(this,ComposeActivity.class));
@@ -88,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        drawerListView = (ListView) findViewById(R.id.navDrawer);
+        drawerListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
+
     }
 
     @Override

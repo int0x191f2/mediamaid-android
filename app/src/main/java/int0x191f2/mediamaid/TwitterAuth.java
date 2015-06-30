@@ -73,6 +73,14 @@ public class TwitterAuth {
             Toast.makeText(context,"Successfully logged into Twitter", Toast.LENGTH_SHORT).show();
         }
     }
+    public void logout(){
+        SharedPreferences.Editor e = prefs.edit();
+        e.putString("accessToken","");
+        e.putString("accessTokenSecret","");
+        e.putBoolean("loggedIn", false);
+        e.commit();
+        Toast.makeText(context,"Logged out of Twitter",Toast.LENGTH_SHORT).show();
+    }
     public class GenerateAccessToken extends AsyncTask<String, Integer, String>{
         @Override
         protected String doInBackground(String... params) {

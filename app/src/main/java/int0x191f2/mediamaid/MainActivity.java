@@ -92,6 +92,21 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.setDrawerListener(mToggle);
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
 
+        //Check that the application hasn't run before settings loggedIn to false
+        if(sp.getBoolean("hasRun",true)){
+            Toast.makeText(getApplicationContext(),"hasRun=false",Toast.LENGTH_SHORT);
+            SharedPreferences.Editor e = sp.edit();
+            e.putBoolean("loggedIn",false);
+            e.putBoolean("hasRun",true);
+            e.commit();
+        }
+        //Check that the user is logged in and set the drawer label accordingly
+        if(sp.getBoolean("loggedIn",false)){
+            drawerItems[0] = "Login";
+        }else{
+            drawerItems[0] = "Logout";
+        }
+
         //Drawer list and action handling
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerListView = (ListView) findViewById(R.id.navDrawer);
@@ -100,12 +115,17 @@ public class MainActivity extends AppCompatActivity {
 
         //Temporary
         TextView tv = (TextView) findViewById(R.id.tweetsTextView);
-        List<Status> statusList = timelineHandler.getTimeline();
-        for (Status status : statusList) {
-            Log.i("MediaMaid",status.getUser().getName() + ":" +
-                    status.getText());
-            tv.setText(tv.getText()+"\n"+status.getUser().getName() + ":" + status.getText());
+        try{
+            List<Status> statusList = timelineHandler.getTimeline();
+            for (Status status : statusList) {
+                Log.i("MediaMaid",status.getUser().getName() + ":" +
+                        status.getText());
+                tv.setText(tv.getText()+"\n"+status.getUser().getName() + ":" + status.getText());
+            }
+        }catch(Exception e){
+            Toast.makeText(getApplicationContext(),"Failed to retrieve timeline. Are you logged in?", Toast.LENGTH_SHORT).show();
         }
+
     }
     @Override
     protected void onPostCreate(Bundle savedInstanceState)

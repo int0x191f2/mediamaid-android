@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawer;
     private ActionBarDrawerToggle mToggle;
     private TwitterTimelineHandler timelineHandler;
+
     public void composeDialog(View view) {
         startActivity(new Intent(this,ComposeActivity.class));
     }
@@ -62,8 +63,27 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Problems logging in. Check your internet connection",Toast.LENGTH_SHORT).show();
         }
     }
-    public void getAccessToken(View view) {
-        //twitterAuth.generateOAuthAccessToken(((EditText) (findViewById(R.id.pinInput))).getText().toString());
+
+    public void getTimeline(){
+        TextView tv = (TextView) findViewById(R.id.tweetsTextView);
+        try{
+            List<Status> statusList = timelineHandler.getTimeline();
+            for (Status status : statusList) {
+                Log.i("MediaMaid",status.getUser().getName() + ":" +
+                        status.getText());
+                tv.setText(tv.getText()+"\n"+status.getUser().getName() + ":" + status.getText());
+            }
+        }catch(Exception e){
+            Log.e("MediaMaid","Error getting timeline"+e.toString());
+            Toast.makeText(getApplicationContext(),"Failed to retrieve timeline. Are you logged in?", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onLogin(){
+        //Keep the login/logout consistent
+        updateDrawer();
+        //Fetch the timeline
+        getTimeline();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,15 +113,27 @@ public class MainActivity extends AppCompatActivity {
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
 
         //Check that the application hasn't run before settings loggedIn to false
-        if(sp.getBoolean("hasRun",true)){
-            Toast.makeText(getApplicationContext(),"hasRun=false",Toast.LENGTH_SHORT);
+        if(!sp.getBoolean("hasRun",false)){
+            Log.i("MediaMaid","Hasn't run yet");
             SharedPreferences.Editor e = sp.edit();
             e.putBoolean("loggedIn",false);
             e.putBoolean("hasRun",true);
             e.commit();
         }
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        //Set up the inital drawer
+        updateDrawer();
+
+        //Get the timeline if the user is logged in
+        getTimeline();
+    }
+    private void updateDrawer(){
         //Check that the user is logged in and set the drawer label accordingly
-        if(sp.getBoolean("loggedIn",false)){
+        if(!sp.getBoolean("loggedIn",true)){
             drawerItems[0] = "Login";
         }else{
             drawerItems[0] = "Logout";
@@ -112,20 +144,6 @@ public class MainActivity extends AppCompatActivity {
         drawerListView = (ListView) findViewById(R.id.navDrawer);
         drawerListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
         drawerListView.setOnItemClickListener(new DrawerItemClickListener());
-
-        //Temporary
-        TextView tv = (TextView) findViewById(R.id.tweetsTextView);
-        try{
-            List<Status> statusList = timelineHandler.getTimeline();
-            for (Status status : statusList) {
-                Log.i("MediaMaid",status.getUser().getName() + ":" +
-                        status.getText());
-                tv.setText(tv.getText()+"\n"+status.getUser().getName() + ":" + status.getText());
-            }
-        }catch(Exception e){
-            Toast.makeText(getApplicationContext(),"Failed to retrieve timeline. Are you logged in?", Toast.LENGTH_SHORT).show();
-        }
-
     }
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
@@ -165,7 +183,16 @@ public class MainActivity extends AppCompatActivity {
     private void navigationDrawerItem(int position) {
         //Login button
         if(position==0){
-            startActivity(new Intent(this,TwitterLoginActivity.class));
+            //Check that the user is logged in
+            if(sp.getBoolean("loggedIn",true)){
+                Log.e("MediaMaid","Logging out");
+                twitterAuth.logout();
+                //Keep the login/logout consistent
+                updateDrawer();
+            }else {
+                Log.e("MediaMaid", "Logging in");
+                startActivity(new Intent(this, TwitterLoginActivity.class));
+            }
         }
     }
 }

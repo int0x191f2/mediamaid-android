@@ -24,13 +24,16 @@ public class TwitterTimelineHandler {
     SharedPreferences sp;
     Context context;
     Twitter twitter;
-    ConfigurationBuilder cb = new ConfigurationBuilder();
+    ConfigurationBuilder cb;
     TwitterFactory tf;
     final static String TWITTER_CONSUMER_KEY = "4dKIk0KoiLRb91DjbES3nfdy5";
     final static String TWITTER_CONSUMER_SECRET = "OJhxMo8lk2N801KxG6e3Nyszx6kUQEsezrX4cFCi2IRtRgotY9";
     public TwitterTimelineHandler(Context c){
         context = c;
+    }
+    public List<Status> getTimeline(){
         sp = context.getSharedPreferences("MediaMaid",0);
+        cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true);
         cb.setOAuthConsumerKey(TWITTER_CONSUMER_KEY);
         cb.setOAuthConsumerSecret(TWITTER_CONSUMER_SECRET);
@@ -38,8 +41,6 @@ public class TwitterTimelineHandler {
         cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret", ""));
         tf = new TwitterFactory(cb.build());
         twitter = tf.getInstance();
-    }
-    public List<Status> getTimeline(){
         List<Status> statuses;
         try{
             statuses = twitter.getHomeTimeline();

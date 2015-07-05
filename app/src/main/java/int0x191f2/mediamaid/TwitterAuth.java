@@ -37,6 +37,7 @@ public class TwitterAuth {
     private Twitter twatter;
     private Activity act;
     private Context context;
+    private MainActivity mm = new MainActivity();
     public TwitterAuth(Context c,String CONSUMER_KEY, String CONSUMER_SECRET){
         try {
             cb.setOAuthConsumerKey(CONSUMER_KEY);
@@ -76,7 +77,7 @@ public class TwitterAuth {
     public void logout(){
         SharedPreferences.Editor e = prefs.edit();
         e.putString("accessToken","");
-        e.putString("accessTokenSecret","");
+        e.putString("accessTokenSecret", "");
         e.putBoolean("loggedIn", false);
         e.commit();
         Toast.makeText(context,"Logged out of Twitter",Toast.LENGTH_SHORT).show();

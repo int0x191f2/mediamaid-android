@@ -167,7 +167,7 @@ public class TwitterTimelineHandler {
                     return null;
                 }
             };
-            Log.e("MediaMaid","Crashed");
+            Log.e("MediaMaid","Crashed+"+e.toString());
         }
         return statuses;
     }

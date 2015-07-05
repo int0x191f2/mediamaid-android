@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawer;
     private ActionBarDrawerToggle mToggle;
     private TwitterTimelineHandler timelineHandler;
+    private ConnectionDetector connectionDetector;
 
     public void composeDialog(View view) {
         startActivity(new Intent(this,ComposeActivity.class));
@@ -65,9 +66,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getTimeline(){
+        if(!connectionDetector.isConnectingToInternet()){
+            Toast.makeText(getApplicationContext(),"No internet connection detected",Toast.LENGTH_SHORT).show();
+        }
         TextView tv = (TextView) findViewById(R.id.tweetsTextView);
         try{
             List<Status> statusList = timelineHandler.getTimeline();
+            tv.setText("");
             for (Status status : statusList) {
                 Log.i("MediaMaid",status.getUser().getName() + ":" +
                         status.getText());
@@ -75,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }catch(Exception e){
             Log.e("MediaMaid","Error getting timeline"+e.toString());
-            Toast.makeText(getApplicationContext(),"Failed to retrieve timeline. Are you logged in?", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         //Fetch the timeline
         getTimeline();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Enable networking on the main thread
@@ -92,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Create the ConnectionDetector
+        connectionDetector = new ConnectionDetector(getApplicationContext());
         //Create the Twitter Authenticator
         twitterAuth = new int0x191f2.mediamaid.TwitterAuth(getApplicationContext(),TWITTER_CONSUMER_KEY,TWITTER_CONSUMER_SECRET);
         //Create the timelineHandler
@@ -119,6 +126,10 @@ public class MainActivity extends AppCompatActivity {
             e.putBoolean("loggedIn",false);
             e.putBoolean("hasRun",true);
             e.commit();
+        }
+
+        if(!connectionDetector.isConnectingToInternet()){
+            Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -170,6 +181,11 @@ public class MainActivity extends AppCompatActivity {
             this.startActivity(new Intent(this,SettingsActivity.class));
             return true;
         }
+
+        if (id == R.id.action_refresh) {
+            getTimeline();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -183,15 +199,19 @@ public class MainActivity extends AppCompatActivity {
     private void navigationDrawerItem(int position) {
         //Login button
         if(position==0){
-            //Check that the user is logged in
-            if(sp.getBoolean("loggedIn",true)){
-                Log.e("MediaMaid","Logging out");
-                twitterAuth.logout();
-                //Keep the login/logout consistent
-                updateDrawer();
-            }else {
-                Log.e("MediaMaid", "Logging in");
-                startActivity(new Intent(this, TwitterLoginActivity.class));
+            if(connectionDetector.isConnectingToInternet()) {
+                //Check that the user is logged in
+                if (sp.getBoolean("loggedIn", true)) {
+                    Log.e("MediaMaid", "Logging out");
+                    twitterAuth.logout();
+                    //Keep the login/logout consistent
+                    updateDrawer();
+                } else {
+                    Log.e("MediaMaid", "Logging in");
+                    startActivity(new Intent(this, TwitterLoginActivity.class));
+                }
+            }else{
+                Toast.makeText(getApplicationContext(),"No internet connection detected", Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static ConnectionDetector cd;
     private AccessToken accessToken;
     private int0x191f2.mediamaid.TwitterAuth twitterAuth;
-    private FloatingActionButton fab;
+    private com.melnykov.fab.FloatingActionButton fab;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ListView drawerListView;
@@ -96,14 +96,19 @@ public class MainActivity extends AppCompatActivity {
         }
         getSupportActionBar().setTitle("MediaMaid");
 
-        //Set up the recyclerview
+        //Set up the recyclerview and fab integration
+        fab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab);
         mRecyclerView = (RecyclerView) findViewById(R.id.timeline_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new TimelineViewAdapter(getDataSet());
-        mRecyclerView.setAdapter(mAdapter);
-
+        fab.attachToRecyclerView(mRecyclerView);
+        try {
+            mAdapter = new TimelineViewAdapter(getDataSet());
+            mRecyclerView.setAdapter(mAdapter);
+        }catch(Exception e){
+            Log.e("MediaMaid","Error parsing timeline");
+        }
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         mDrawer = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -149,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
         drawerListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
         drawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
+    private void onItemClickCustom(int pos){
+        Toast.makeText(getApplicationContext(),"Clicked item"+pos,Toast.LENGTH_SHORT).show();
+    }
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
@@ -164,6 +172,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        ((TimelineViewAdapter) mAdapter).setItemOnClickListener(new
+            TimelineViewAdapter.MyClickListener(){
+            @Override
+            public void onItemClick(int pos, View v){
+                onItemClickCustom(pos);
+            }
+        });
     }
     private ArrayList<TimelineDataObject> getDataSet(){
         int index=0;
@@ -176,20 +191,13 @@ public class MainActivity extends AppCompatActivity {
         }
         return results;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             this.startActivity(new Intent(this,SettingsActivity.class));
             return true;
         }
-
         if (id == R.id.action_refresh) {
             getTimeline();
         }

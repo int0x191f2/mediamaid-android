@@ -8,6 +8,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.List;
+import java.util.ArrayList;
 import android.util.Log;
 
 import org.w3c.dom.Text;
@@ -52,35 +55,17 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mToggle;
     private TwitterTimelineHandler timelineHandler;
     private ConnectionDetector connectionDetector;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
 
     public void composeDialog(View view) {
         startActivity(new Intent(this,ComposeActivity.class));
     }
 
-    public void getRequestToken(View view) {
-        try{
-            this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(twitterAuth.getOAuthRequestToken().getAuthorizationURL())));
-        }catch(Exception e){
-            Toast.makeText(getApplicationContext(),"Problems logging in. Check your internet connection",Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void getTimeline(){
-        if(!connectionDetector.isConnectingToInternet()){
-            Toast.makeText(getApplicationContext(),"No internet connection detected",Toast.LENGTH_SHORT).show();
-        }
-        TextView tv = (TextView) findViewById(R.id.tweetsTextView);
-        try{
-            List<Status> statusList = timelineHandler.getTimeline();
-            tv.setText("");
-            for (Status status : statusList) {
-                Log.i("MediaMaid",status.getUser().getName() + ":" +
-                        status.getText());
-                tv.setText(tv.getText()+"\n"+status.getUser().getName() + ":" + status.getText());
-            }
-        }catch(Exception e){
-            Log.e("MediaMaid","Error getting timeline"+e.toString());
-        }
+    public List<Status> getTimeline(){
+            return timelineHandler.getTimeline();
     }
 
     public void onLogin(){
@@ -110,6 +95,14 @@ public class MainActivity extends AppCompatActivity {
             setSupportActionBar(tb);
         }
         getSupportActionBar().setTitle("MediaMaid");
+
+        //Set up the recyclerview
+        mRecyclerView = (RecyclerView) findViewById(R.id.timeline_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new TimelineViewAdapter(getDataSet());
+        mRecyclerView.setAdapter(mAdapter);
 
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -168,6 +161,21 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+    private ArrayList<TimelineDataObject> getDataSet(){
+        int index=0;
+        ArrayList results = new ArrayList<TimelineDataObject>();
+        List<Status> statuses = getTimeline();
+        for (Status status : statuses) {
+            TimelineDataObject obj = new TimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),status.getText());
+            results.add(index, obj);
+            index++;
+        }
+        return results;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -206,8 +214,11 @@ public class MainActivity extends AppCompatActivity {
                     twitterAuth.logout();
                     //Keep the login/logout consistent
                     updateDrawer();
+                    //Clear timeline on logout
+                    getTimeline();
                 } else {
                     Log.e("MediaMaid", "Logging in");
+                    //Start the login activity
                     startActivity(new Intent(this, TwitterLoginActivity.class));
                 }
             }else{

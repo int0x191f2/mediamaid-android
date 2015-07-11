@@ -36,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
     Twitter twatter;
     ConfigurationBuilder cb = new ConfigurationBuilder();
     TwitterFactory tf;
-    final static String TWITTER_CONSUMER_KEY = "4dKIk0KoiLRb91DjbES3nfdy5";
-    final static String TWITTER_CONSUMER_SECRET = "OJhxMo8lk2N801KxG6e3Nyszx6kUQEsezrX4cFCi2IRtRgotY9";
     static String PREFERENCE_NAME = "twitter_oauth";
     static final String PREF_KEY_OAUTH_TOKEN = "oauth_token";
     static final String PREF_KEY_OAUTH_SECRET = "oauth_token_secret";
@@ -85,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         //Create the ConnectionDetector
         connectionDetector = new ConnectionDetector(getApplicationContext());
         //Create the Twitter Authenticator
-        twitterAuth = new int0x191f2.mediamaid.TwitterAuth(getApplicationContext(),TWITTER_CONSUMER_KEY,TWITTER_CONSUMER_SECRET);
+        twitterAuth = new int0x191f2.mediamaid.TwitterAuth(getApplicationContext(),BuildVars.TWITTER_CONSUMER_KEY,BuildVars.TWITTER_CONSUMER_SECRET);
         //Create the timelineHandler
         timelineHandler = new TwitterTimelineHandler(getApplicationContext());
         //Set the toolbar title and color

@@ -27,8 +27,8 @@ public class TwitterTweet {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         TwitterFactory tf;
         cb.setDebugEnabled(true);
-        cb.setOAuthConsumerKey(TWITTER_CONSUMER_KEY);
-        cb.setOAuthConsumerSecret(TWITTER_CONSUMER_SECRET);
+        cb.setOAuthConsumerKey(BuildVars.TWITTER_CONSUMER_KEY);
+        cb.setOAuthConsumerSecret(BuildVars.TWITTER_CONSUMER_SECRET);
         cb.setOAuthAccessToken(sp.getString("accessToken",""));
         cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret",""));
         tf = new TwitterFactory(cb.build());

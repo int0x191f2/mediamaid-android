@@ -7,23 +7,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.ArrayList;
 
-import java.lang.reflect.Array;
-
-import twitter4j.json.DataObjectFactory;
-
 /**
  * Created by ip4gjb on 7/7/15.
  */
-public class TimelineViewAdapter extends RecyclerView.Adapter<TimelineViewAdapter.DataObjectHolder>{
+public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTimelineViewAdapter.DataObjectHolder>{
     private MyClickListener clickListener;
-    private ArrayList<TimelineDataObject> dataset;
+    private ArrayList<TwitterTimelineDataObject> dataset;
     public class DataObjectHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView realName;
         TextView userName;
         TextView tweetPayload;
         public DataObjectHolder(View itemView){
             super(itemView);
-            //TODO setup textviews
             realName = (TextView) itemView.findViewById(R.id.realName);
             userName = (TextView) itemView.findViewById(R.id.userName);
             tweetPayload = (TextView) itemView.findViewById(R.id.tweetPayload);
@@ -51,7 +46,7 @@ public class TimelineViewAdapter extends RecyclerView.Adapter<TimelineViewAdapte
         holder.userName.setText(dataset.get(position).getUserName());
         holder.tweetPayload.setText(dataset.get(position).getTweetPayload());
     }
-    public void addItem(TimelineDataObject dataObject, int index){
+    public void addItem(TwitterTimelineDataObject dataObject, int index){
         dataset.add(dataObject);
         notifyItemInserted(index);
     }
@@ -59,7 +54,7 @@ public class TimelineViewAdapter extends RecyclerView.Adapter<TimelineViewAdapte
         dataset.remove(index);
         notifyItemRemoved(index);
     }
-    public TimelineViewAdapter(ArrayList<TimelineDataObject> dataset){
+    public TwitterTimelineViewAdapter(ArrayList<TwitterTimelineDataObject> dataset){
         this.dataset = dataset;
     }
     public interface MyClickListener{

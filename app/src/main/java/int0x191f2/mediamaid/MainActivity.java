@@ -2,9 +2,8 @@ package int0x191f2.mediamaid;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.StrictMode;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,38 +16,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.util.List;
 import java.util.ArrayList;
 import android.util.Log;
 
-import org.w3c.dom.Text;
-
 import twitter4j.*;
-import twitter4j.auth.AccessToken;
-import twitter4j.conf.ConfigurationBuilder;
 
 
 public class MainActivity extends AppCompatActivity {
-    Twitter twatter;
-    ConfigurationBuilder cb = new ConfigurationBuilder();
-    TwitterFactory tf;
-    static String PREFERENCE_NAME = "twitter_oauth";
-    static final String PREF_KEY_OAUTH_TOKEN = "oauth_token";
-    static final String PREF_KEY_OAUTH_SECRET = "oauth_token_secret";
-    static final String PREF_KEY_TWITTER_LOGIN = "isTwitterLoggedIn";
+    public String[] drawerItems = {"Login"};
     private static SharedPreferences sp;
-    private static ConnectionDetector cd;
-    private AccessToken accessToken;
     private int0x191f2.mediamaid.TwitterAuth twitterAuth;
     private com.melnykov.fab.FloatingActionButton fab;
-    private Toolbar toolbar;
-    private DrawerLayout drawerLayout;
     private ListView drawerListView;
-    private String[] drawerItems = {"Login"};
     private DrawerLayout mDrawer;
     private ActionBarDrawerToggle mToggle;
     private TwitterTimelineHandler timelineHandler;
@@ -59,18 +41,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void composeDialog(View view) {
-        startActivity(new Intent(this,ComposeActivity.class));
+        startActivity(new Intent(this, ComposeActivity.class));
     }
 
-    public List<Status> getTimeline(){
-            return timelineHandler.getTimeline();
-    }
-
-    public void onLogin(){
-        //Keep the login/logout consistent
-        updateDrawer();
-        //Fetch the timeline
-        getTimeline();
+    public void updateTimeline(){
+        new getDataSet().execute(new ArrayList<TwitterTimelineDataObject>());
     }
 
     @Override
@@ -101,12 +76,9 @@ public class MainActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         fab.attachToRecyclerView(mRecyclerView);
-        try {
-            mAdapter = new TimelineViewAdapter(getDataSet());
-            mRecyclerView.setAdapter(mAdapter);
-        }catch(Exception e){
-            Log.e("MediaMaid","Error parsing timeline");
-        }
+        //Pass a new array list; when onStart calls it updates the timeline.
+        mAdapter = new TwitterTimelineViewAdapter(new ArrayList<TwitterTimelineDataObject>());
+        mRecyclerView.setAdapter(mAdapter);
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         mDrawer = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -136,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         updateDrawer();
 
         //Get the timeline if the user is logged in
-        getTimeline();
+        updateTimeline();
     }
     private void updateDrawer(){
         //Check that the user is logged in and set the drawer label accordingly
@@ -147,13 +119,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Drawer list and action handling
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerListView = (ListView) findViewById(R.id.navDrawer);
         drawerListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
         drawerListView.setOnItemClickListener(new DrawerItemClickListener());
-    }
-    private void onItemClickCustom(int pos){
-        Toast.makeText(getApplicationContext(),"Clicked item"+pos,Toast.LENGTH_SHORT).show();
     }
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
@@ -170,25 +138,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ((TimelineViewAdapter) mAdapter).setItemOnClickListener(new
-            TimelineViewAdapter.MyClickListener(){
+        ((TwitterTimelineViewAdapter) mAdapter).setItemOnClickListener(new
+            TwitterTimelineViewAdapter.MyClickListener(){
             @Override
             public void onItemClick(int pos, View v){
-                onItemClickCustom(pos);
+                new TwitterTimelineClickHandler(getApplicationContext()).onItemClick(pos);
             }
         });
     }
-    private ArrayList<TimelineDataObject> getDataSet(){
-        int index=0;
-        ArrayList results = new ArrayList<TimelineDataObject>();
-        List<Status> statuses = getTimeline();
-        for (Status status : statuses) {
-            TimelineDataObject obj = new TimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),status.getText());
-            results.add(index, obj);
-            index++;
-        }
-        return results;
-    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -197,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_refresh) {
-            getTimeline();
+            updateTimeline();
         }
 
         return super.onOptionsItemSelected(item);
@@ -221,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                     //Keep the login/logout consistent
                     updateDrawer();
                     //Clear timeline on logout
-                    getTimeline();
+                    //getTimeline();
                 } else {
                     Log.e("MediaMaid", "Logging in");
                     //Start the login activity
@@ -230,6 +188,27 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 Toast.makeText(getApplicationContext(),"No internet connection detected", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+    private class getDataSet extends AsyncTask<ArrayList<TwitterTimelineDataObject>,Integer,ArrayList<TwitterTimelineDataObject>>{
+        @Override
+        protected ArrayList<TwitterTimelineDataObject> doInBackground(ArrayList<TwitterTimelineDataObject>... params) {
+            int index=0;
+            ArrayList results = new ArrayList<TwitterTimelineDataObject>();
+            List<twitter4j.Status> statuses = timelineHandler.getTimeline();
+            for (twitter4j.Status status : statuses) {
+                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),status.getText());
+                results.add(index, obj);
+                index++;
+            }
+            return results;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<TwitterTimelineDataObject> twitterTimelineDataObjects) {
+            super.onPostExecute(twitterTimelineDataObjects);
+            mAdapter = new TwitterTimelineViewAdapter(twitterTimelineDataObjects);
+            mRecyclerView.setAdapter(mAdapter);
         }
     }
 }

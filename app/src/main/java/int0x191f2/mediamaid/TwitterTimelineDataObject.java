@@ -3,11 +3,11 @@ package int0x191f2.mediamaid;
 /**
  * Created by ip4gjb on 7/7/15.
  */
-public class TimelineDataObject {
+public class TwitterTimelineDataObject {
     private String realName;
     private String userName;
     private String tweetPayload;
-    TimelineDataObject(String rn, String un, String tp){
+    TwitterTimelineDataObject(String rn, String un, String tp){
         realName = rn;
         userName = un;
         tweetPayload = tp;

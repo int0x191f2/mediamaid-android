@@ -18,13 +18,10 @@ import twitter4j.conf.ConfigurationBuilder;
  */
 public class TwitterAuth {
     private static SharedPreferences prefs;
-    private Boolean isKeysSet=false;
-    private Boolean isKeysGenerated=false;
     public RequestToken requestToken;
     private AccessToken accessToken,a;
     private ConfigurationBuilder cb = new ConfigurationBuilder();
     private Twitter twatter;
-    private Activity act;
     private Context context;
     private MainActivity mm = new MainActivity();
 
@@ -37,10 +34,8 @@ public class TwitterAuth {
             twatter = fact.getInstance();
             prefs = c.getSharedPreferences("MediaMaid",0);
             context = c;
-            isKeysSet=true;
         }catch(Exception e){
             Log.e("MediaMaid","Error Authenticating with Twitter"+e.toString());
-            isKeysSet=false;
         }
     }
 

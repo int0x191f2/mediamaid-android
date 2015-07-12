@@ -16,8 +16,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterTweet {
     SharedPreferences sp;
     Context context;
-    final static String TWITTER_CONSUMER_KEY = "4dKIk0KoiLRb91DjbES3nfdy5";
-    final static String TWITTER_CONSUMER_SECRET = "OJhxMo8lk2N801KxG6e3Nyszx6kUQEsezrX4cFCi2IRtRgotY9";
+
     public TwitterTweet(Context c){
         context = c;
         sp = context.getSharedPreferences("MediaMaid",0);

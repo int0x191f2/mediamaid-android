@@ -2,6 +2,7 @@ package int0x191f2.mediamaid;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v4.widget.DrawerLayout;
@@ -23,12 +24,13 @@ import java.util.ArrayList;
 import android.util.Log;
 
 import twitter4j.*;
+import twitter4j.auth.AccessToken;
 
 
 public class MainActivity extends AppCompatActivity {
     public String[] drawerItems = {"Login"};
     private static SharedPreferences sp;
-    private int0x191f2.mediamaid.TwitterAuth twitterAuth;
+    private TwitterAuth twitterAuth;
     private com.melnykov.fab.FloatingActionButton fab;
     private ListView drawerListView;
     private DrawerLayout mDrawer;
@@ -55,15 +57,11 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
-        //Start the login activity if the user isn't logged in
-        if(!sp.getBoolean("loggedIn",false)){
-            startActivity(new Intent(this,LoginActivity.class));
-        }
+
         //Create the ConnectionDetector
         connectionDetector = new ConnectionDetector(getApplicationContext());
         //Create the Twitter Authenticator
-        twitterAuth = new int0x191f2.mediamaid.TwitterAuth(getApplicationContext(),BuildVars.TWITTER_CONSUMER_KEY,BuildVars.TWITTER_CONSUMER_SECRET);
+        twitterAuth = TwitterAuth.getInstance();
         //Create the timelineHandler
         timelineHandler = new TwitterTimelineHandler(getApplicationContext());
         //Set the toolbar title and color
@@ -73,6 +71,30 @@ public class MainActivity extends AppCompatActivity {
             setSupportActionBar(tb);
         }
         getSupportActionBar().setTitle("MediaMaid");
+
+        sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
+        //Start the login activity if the user isn't logged in
+        if(!sp.getBoolean(BuildVars.SHARED_PREFERENCES_LOGGED_IN_KEY,false)){
+            Log.i("MediaMaid", "We weren't logged in OR we just logged in");
+            Uri uri = getIntent().getData();
+            if (uri != null && uri.toString().startsWith(BuildVars.TWITTER_OAUTH_CALLBACK)) { //this means we just logged in
+                Log.i("MediaMaid", "We are attempting to log in with the OAuth");
+                String verifier = uri.getQueryParameter(BuildVars.TWITTER_OAUTH_VERIFIER);
+                Log.i("MediaMaid", "verifier: "+verifier);
+                AccessToken token = twitterAuth.generateOAuthAccessToken(verifier);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_KEY, token.getToken());
+                editor.putString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY, token.getTokenSecret());
+                editor.putBoolean(BuildVars.SHARED_PREFERENCES_LOGGED_IN_KEY, true);
+                editor.apply();
+            }
+
+            else { //this means we need to log in
+                Log.i("MediaMaid", "We really weren't logged in and started the login activity");
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            }
+        }
 
         //Set up the recyclerview and fab integr\ation
         fab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab);
@@ -92,14 +114,14 @@ public class MainActivity extends AppCompatActivity {
         mToggle.setDrawerIndicatorEnabled(true);
         mDrawer.setDrawerListener(mToggle);
 
-        //Check that the application hasn't run before settings loggedIn to false
+        /*//Check that the application hasn't run before settings loggedIn to false
         if(!sp.getBoolean("hasRun",false)){
             Log.i("MediaMaid","Hasn't run yet");
             SharedPreferences.Editor e = sp.edit();
             e.putBoolean("loggedIn",false);
             e.putBoolean("hasRun",true);
             e.commit();
-        }
+        }*/
 
         if(!connectionDetector.isConnectingToInternet()){
             Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
@@ -175,11 +197,13 @@ public class MainActivity extends AppCompatActivity {
                 //Check that the user is logged in
                 if (sp.getBoolean("loggedIn", true)) {
                     Log.e("MediaMaid", "Logging out");
-                    twitterAuth.logout();
-                    //Keep the login/logout consistent
-                    updateDrawer();
-                    //Clear timeline on logout
+                    logout();  //Keep the login/logout consistent
+                    updateDrawer(); //Clear timeline on logout
                     //getTimeline();
+                    Intent returnToLogin = new Intent(this,LoginActivity.class);
+                    startActivity(returnToLogin);
+                    finish();
+
                 } else {
                     Log.e("MediaMaid", "Logging in");
                     //Start the login activity
@@ -189,6 +213,16 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"No internet connection detected", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void logout() {
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_KEY,"");
+        editor.putString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY,"");
+        editor.putBoolean(BuildVars.SHARED_PREFERENCES_LOGGED_IN_KEY, false);
+        editor.apply();
+        TwitterAuth.resetInstance();
+        twitterAuth = TwitterAuth.getInstance();
     }
     private class GetDataSet extends AsyncTask<ArrayList<TwitterTimelineDataObject>,Integer,ArrayList<TwitterTimelineDataObject>>{
         @Override

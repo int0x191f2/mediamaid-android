@@ -21,18 +21,20 @@ import twitter4j.auth.RequestToken;
 
 
 public class TwitterLoginActivity extends AppCompatActivity {
-    private AccessToken accessToken;
-    private int0x191f2.mediamaid.TwitterAuth twitterAuth;
+/*    private AccessToken accessToken;
+    private TwitterAuth twitterAuth;
     private SharedPreferences prefs;
 
     public void getAccessToken(View view){
         twitterAuth.generateOAuthAccessToken(((EditText) findViewById(R.id.twitterPinInput)).getText().toString());
+        //Intent goToMainActivity = new Intent(this,MainActivity.class);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_twitter_login);
+        Log.i("MediaMaid","TwitterLoginActivity created");
         twitterAuth = new TwitterAuth(getApplicationContext(),BuildVars.TWITTER_CONSUMER_KEY,BuildVars.TWITTER_CONSUMER_SECRET);
         Toolbar tb = (Toolbar) findViewById(R.id.twitterLoginToolbar);
         tb.setTitleTextColor(0xFFFFFFFF);
@@ -65,5 +67,5 @@ public class TwitterLoginActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    } */
 }

@@ -1,5 +1,6 @@
 package int0x191f2.mediamaid;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +17,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import twitter4j.Twitter;
+
 public class LoginActivity extends AppCompatActivity {
     TwitterAuth twitterAuth;
     SharedPreferences sp;
@@ -24,7 +27,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
-        twitterAuth = new TwitterAuth(getApplicationContext(),BuildVars.TWITTER_CONSUMER_KEY,BuildVars.TWITTER_CONSUMER_SECRET);
+        twitterAuth = TwitterAuth.getInstance();
+
         Toolbar tb = (Toolbar) findViewById(R.id.loginActivityToolbar);
         tb.setTitleTextColor(0xFFFFFFFF);
         if(tb!=null){
@@ -32,8 +36,10 @@ public class LoginActivity extends AppCompatActivity {
         }
         getSupportActionBar().setTitle("Login");
     }
-    public void twitterLogin(View v){
-        startActivity(new Intent(this,TwitterLoginActivity.class));
+    public void twitterLogin(View v) {
+        twitterAuth.generateOAuthRequestToken();
+        this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(twitterAuth.getOAuthRequestToken().getAuthorizationURL())));
+        finish();
     }
     @Override
     protected void onDestroy(){

@@ -17,60 +17,65 @@ import twitter4j.conf.ConfigurationBuilder;
  * Created by Adam on 6/18/2015.
  */
 public class TwitterAuth {
-    private static SharedPreferences prefs;
-    public RequestToken requestToken;
-    private AccessToken accessToken,a;
+    //private static SharedPreferences prefs;
+    private RequestToken requestToken;
+    private AccessToken accessToken;
     private ConfigurationBuilder cb = new ConfigurationBuilder();
     private Twitter twatter;
-    private Context context;
-    private MainActivity mm = new MainActivity();
+    //private Context context;
 
-    public TwitterAuth(Context c,String CONSUMER_KEY, String CONSUMER_SECRET){
+    public static TwitterAuth instance = new TwitterAuth();
+
+    public static void resetInstance() {
+        instance = new TwitterAuth();
+    }
+
+    public TwitterAuth(){
         try {
-            cb.setOAuthConsumerKey(CONSUMER_KEY);
-            cb.setOAuthConsumerSecret(CONSUMER_SECRET);
+            cb.setOAuthConsumerKey(BuildVars.TWITTER_CONSUMER_KEY);
+            cb.setOAuthConsumerSecret(BuildVars.TWITTER_CONSUMER_SECRET);
             Configuration config = cb.build();
             TwitterFactory fact = new TwitterFactory(config);
             twatter = fact.getInstance();
-            prefs = c.getSharedPreferences("MediaMaid",0);
-            context = c;
+            //prefs = c.getSharedPreferences("MediaMaid",0);
+            //context = c;
         }catch(Exception e){
             Log.e("MediaMaid","Error Authenticating with Twitter"+e.toString());
         }
     }
 
-    public RequestToken getOAuthRequestToken(){
+    public static TwitterAuth getInstance() {
+        return instance;
+    }
+
+    public RequestToken getOAuthRequestToken() {
+        if (requestToken == null) {
+            generateOAuthRequestToken();
+        }
         return requestToken;
     }
 
     public void generateOAuthRequestToken(){
         try {
-            requestToken = twatter.getOAuthRequestToken();
+            requestToken = twatter.getOAuthRequestToken(BuildVars.TWITTER_OAUTH_CALLBACK);
             Log.i("MediaMaid", requestToken.toString());
         } catch (Exception e) {
             Log.e("MediaMaid", "Error creating requestToken"+e.toString());
         }
     }
 
-    public void generateOAuthAccessToken(String pin){
-        new AccessTokenGenerator().execute(pin);
-    }
-
-    public void checkOAuthAccessToken(){
-        if(accessToken==null){
-            Toast.makeText(context,"Error logging into Twitter",Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(context,"Successfully logged into Twitter", Toast.LENGTH_SHORT).show();
+    public AccessToken generateOAuthAccessToken(String pin){
+        try {
+            new AccessTokenGenerator().execute(pin).get();
         }
+        catch (Exception e) {
+            Log.e("MediaMaid", "Fatal threading error");
+        }
+        return accessToken;
     }
 
-    public void logout(){
-        SharedPreferences.Editor e = prefs.edit();
-        e.putString("accessToken","");
-        e.putString("accessTokenSecret", "");
-        e.putBoolean("loggedIn", false);
-        e.commit();
-        Toast.makeText(context,"Logged out of Twitter",Toast.LENGTH_SHORT).show();
+    public RequestToken getRequestToken() {
+        return requestToken;
     }
 
     public class AccessTokenGenerator extends AsyncTask<String, Integer, String>{
@@ -80,21 +85,16 @@ public class TwitterAuth {
             try{
                 Log.i("MediaMaid","Access Token Pin:"+s);
                 accessToken = twatter.getOAuthAccessToken(requestToken,s);
-                SharedPreferences.Editor e = prefs.edit();
-                e.putString("accessToken",accessToken.getToken());
-                e.putString("accessTokenSecret",accessToken.getTokenSecret());
-                e.putBoolean("loggedIn",true);
-                e.commit();
-                return s;
+                return null;
+
             }catch(Exception e){
                 Log.e("MediaMaid","Failed to get accessToken"+e.toString());
-                return s;
+                return null;
             }
         }
 
         @Override
         protected void onPostExecute(String s) {
-            checkOAuthAccessToken();
             super.onPostExecute(s);
         }
     }

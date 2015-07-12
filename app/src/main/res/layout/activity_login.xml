@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="int0x191f2.mediamaid.SettingsActivity">
+
+    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/loginActivityToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:paddingTop="24dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        android:elevation="4dp" />
+
+    <Button
+        android:id="@+id/loginActivityTwitterLoginButton"
+        android:text="@string/login_twitter"
+        android:onClick="twitterLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

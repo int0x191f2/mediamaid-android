@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateTimeline(){
-        new getDataSet().execute(new ArrayList<TwitterTimelineDataObject>());
+        new GetDataSet().execute(new ArrayList<TwitterTimelineDataObject>());
     }
 
     @Override
@@ -55,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
+        //Start the login activity if the user isn't logged in
+        if(!sp.getBoolean("loggedIn",false)){
+            startActivity(new Intent(this,LoginActivity.class));
+        }
         //Create the ConnectionDetector
         connectionDetector = new ConnectionDetector(getApplicationContext());
         //Create the Twitter Authenticator
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         }
         getSupportActionBar().setTitle("MediaMaid");
 
-        //Set up the recyclerview and fab integration
+        //Set up the recyclerview and fab integr\ation
         fab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab);
         mRecyclerView = (RecyclerView) findViewById(R.id.timeline_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -77,15 +82,15 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         fab.attachToRecyclerView(mRecyclerView);
         //Pass a new array list; when onStart calls it updates the timeline.
-        mAdapter = new TwitterTimelineViewAdapter(new ArrayList<TwitterTimelineDataObject>());
-        mRecyclerView.setAdapter(mAdapter);
+//        if(!sp.getBoolean("loggedIn",false)){
+//            startActivity(new Intent(this,LoginActivity.class));
+//        }
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         mDrawer = (DrawerLayout) findViewById(R.id.drawerLayout);
         mToggle = new ActionBarDrawerToggle(this,mDrawer,tb,R.string.drawer_open, R.string.drawer_close);
         mToggle.setDrawerIndicatorEnabled(true);
         mDrawer.setDrawerListener(mToggle);
-        sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
 
         //Check that the application hasn't run before settings loggedIn to false
         if(!sp.getBoolean("hasRun",false)){
@@ -108,7 +113,9 @@ public class MainActivity extends AppCompatActivity {
         updateDrawer();
 
         //Get the timeline if the user is logged in
-        updateTimeline();
+        if(sp.getBoolean("loggedIn",false)){
+            updateTimeline();
+        }
     }
     private void updateDrawer(){
         //Check that the user is logged in and set the drawer label accordingly
@@ -138,13 +145,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ((TwitterTimelineViewAdapter) mAdapter).setItemOnClickListener(new
-            TwitterTimelineViewAdapter.MyClickListener(){
-            @Override
-            public void onItemClick(int pos, View v){
-                new TwitterTimelineClickHandler(getApplicationContext()).onItemClick(pos);
-            }
-        });
     }
 
     @Override
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private class getDataSet extends AsyncTask<ArrayList<TwitterTimelineDataObject>,Integer,ArrayList<TwitterTimelineDataObject>>{
+    private class GetDataSet extends AsyncTask<ArrayList<TwitterTimelineDataObject>,Integer,ArrayList<TwitterTimelineDataObject>>{
         @Override
         protected ArrayList<TwitterTimelineDataObject> doInBackground(ArrayList<TwitterTimelineDataObject>... params) {
             int index=0;
@@ -209,6 +209,13 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(twitterTimelineDataObjects);
             mAdapter = new TwitterTimelineViewAdapter(twitterTimelineDataObjects);
             mRecyclerView.setAdapter(mAdapter);
+            ((TwitterTimelineViewAdapter) mAdapter).setItemOnClickListener(new
+                                                                                   TwitterTimelineViewAdapter.MyClickListener(){
+                                                                                       @Override
+                                                                                       public void onItemClick(int pos, View v){
+                                                                                           new TwitterTimelineClickHandler(getApplicationContext()).onItemClick(pos);
+                                                                                       }
+                                                                                   });
         }
     }
 }

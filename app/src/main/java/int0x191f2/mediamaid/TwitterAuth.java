@@ -2,21 +2,10 @@ package int0x191f2.mediamaid;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.StrictMode;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
-
-import java.util.AbstractCollection;
 
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
@@ -38,6 +27,7 @@ public class TwitterAuth {
     private Activity act;
     private Context context;
     private MainActivity mm = new MainActivity();
+
     public TwitterAuth(Context c,String CONSUMER_KEY, String CONSUMER_SECRET){
         try {
             cb.setOAuthConsumerKey(CONSUMER_KEY);
@@ -53,9 +43,11 @@ public class TwitterAuth {
             isKeysSet=false;
         }
     }
+
     public RequestToken getOAuthRequestToken(){
         return requestToken;
     }
+
     public void generateOAuthRequestToken(){
         try {
             requestToken = twatter.getOAuthRequestToken();
@@ -64,9 +56,11 @@ public class TwitterAuth {
             Log.e("MediaMaid", "Error creating requestToken"+e.toString());
         }
     }
+
     public void generateOAuthAccessToken(String pin){
-        new GenerateAccessToken().execute(pin);
+        new AccessTokenGenerator().execute(pin);
     }
+
     public void checkOAuthAccessToken(){
         if(accessToken==null){
             Toast.makeText(context,"Error logging into Twitter",Toast.LENGTH_SHORT).show();
@@ -74,6 +68,7 @@ public class TwitterAuth {
             Toast.makeText(context,"Successfully logged into Twitter", Toast.LENGTH_SHORT).show();
         }
     }
+
     public void logout(){
         SharedPreferences.Editor e = prefs.edit();
         e.putString("accessToken","");
@@ -82,7 +77,8 @@ public class TwitterAuth {
         e.commit();
         Toast.makeText(context,"Logged out of Twitter",Toast.LENGTH_SHORT).show();
     }
-    public class GenerateAccessToken extends AsyncTask<String, Integer, String>{
+
+    public class AccessTokenGenerator extends AsyncTask<String, Integer, String>{
         @Override
         protected String doInBackground(String... params) {
             String s = params[0];

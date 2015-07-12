@@ -14,4 +14,6 @@
     <string name="drawer_close">The drawer is closed</string>
     <string name="title_activity_settings">settings</string>
     <string name="title_activity_twitter_login">TwitterLoginActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="login_twitter">Login with Twitter</string>
 </resources>

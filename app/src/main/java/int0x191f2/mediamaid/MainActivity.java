@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
 
     public void composeDialog(View view) {
@@ -97,8 +99,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Set up the recyclerview and fab integr\ation
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.timelineRefreshLayout);
         fab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab);
         mRecyclerView = (RecyclerView) findViewById(R.id.timeline_recycler_view);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                updateTimeline();
+            }
+        });
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -250,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                            new TwitterTimelineClickHandler(getApplicationContext()).onItemClick(pos);
                                                                                        }
                                                                                    });
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 }

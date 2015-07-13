@@ -37,8 +37,6 @@ public class TwitterAuth {
             Configuration config = cb.build();
             TwitterFactory fact = new TwitterFactory(config);
             twatter = fact.getInstance();
-            //prefs = c.getSharedPreferences("MediaMaid",0);
-            //context = c;
         }catch(Exception e){
             Log.e("MediaMaid","Error Authenticating with Twitter"+e.toString());
         }

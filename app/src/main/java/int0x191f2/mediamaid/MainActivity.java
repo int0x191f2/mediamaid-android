@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     public String[] drawerItems = {"Login"};
     private static SharedPreferences sp;
     private TwitterAuth twitterAuth;
+    private TwitterPictureCacheHandler twitterPictureCacheHandler;
     private com.melnykov.fab.FloatingActionButton fab;
     private ListView drawerListView;
     private DrawerLayout mDrawer;
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         twitterAuth = TwitterAuth.getInstance();
         //Create the timelineHandler
         timelineHandler = new TwitterTimelineHandler(getApplicationContext());
+        //Create the picture cache handler
+        twitterPictureCacheHandler = new TwitterPictureCacheHandler(getApplicationContext());
         //Set the toolbar title and color
         Toolbar tb = (Toolbar) findViewById(R.id.mainToolbar);
         tb.setTitleTextColor(0xFFFFFFFF);
@@ -193,10 +196,6 @@ public class MainActivity extends AppCompatActivity {
             this.startActivity(new Intent(this,SettingsActivity.class));
             return true;
         }
-        if (id == R.id.action_refresh) {
-            updateTimeline();
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -248,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
             List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
             for (twitter4j.Status status : statuses) {
-                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),status.getText(), getImageFromURL(status.getUser().getOriginalProfileImageURL()));
+                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),status.getText(), twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
                 results.add(index, obj);
                 index++;
             }

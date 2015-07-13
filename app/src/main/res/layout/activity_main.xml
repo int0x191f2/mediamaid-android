@@ -41,6 +41,7 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
             android:onClick="composeDialog"
+            fab:elevation="7dp"
             fab:fab_colorNormal="@color/primary_red"
             fab:fab_colorPressed="@color/primary_red_dark"
             fab:fab_colorRipple="@color/fab_ripple" />

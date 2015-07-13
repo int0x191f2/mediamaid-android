@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by ip4gjb on 7/7/15.
  */
@@ -14,14 +16,16 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
     private MyClickListener clickListener;
     private ArrayList<TwitterTimelineDataObject> dataset;
     public class DataObjectHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        CircleImageView profileImage;
         TextView realName;
         TextView userName;
         TextView tweetPayload;
         public DataObjectHolder(View itemView){
             super(itemView);
-            realName = (TextView) itemView.findViewById(R.id.realName);
-            userName = (TextView) itemView.findViewById(R.id.userName);
-            tweetPayload = (TextView) itemView.findViewById(R.id.tweetPayload);
+            profileImage = (CircleImageView) itemView.findViewById(R.id.cardViewProfileImage);
+            realName = (TextView) itemView.findViewById(R.id.cardViewRealName);
+            userName = (TextView) itemView.findViewById(R.id.cardViewUserName);
+            tweetPayload = (TextView) itemView.findViewById(R.id.cardViewTweetPayload);
             itemView.setOnClickListener(this);
         }
         @Override
@@ -36,12 +40,13 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
     public DataObjectHolder onCreateViewHolder(ViewGroup parent,
                                                int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.twitter_timeline_layout, parent, false);
+                .inflate(R.layout.timeline_cardview_layout, parent, false);
         DataObjectHolder dataObjectHolder = new DataObjectHolder(view);
         return dataObjectHolder;
     }
     @Override
     public void onBindViewHolder(DataObjectHolder holder,int position){
+        holder.profileImage.setImageBitmap(dataset.get(position).getProfileImage());
         holder.realName.setText(dataset.get(position).getRealName());
         holder.userName.setText(dataset.get(position).getUserName());
         holder.tweetPayload.setText(dataset.get(position).getTweetPayload());

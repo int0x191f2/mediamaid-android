@@ -2,6 +2,8 @@ package int0x191f2.mediamaid;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
@@ -18,12 +20,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import android.util.Log;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
 
@@ -42,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private CircleImageView mCircleImageView;
 
 
     public void composeDialog(View view) {
@@ -99,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Set up the recyclerview and fab integr\ation
+        mCircleImageView = (CircleImageView) findViewById(R.id.cardViewProfileImage);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.timelineRefreshLayout);
         fab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab);
         mRecyclerView = (RecyclerView) findViewById(R.id.timeline_recycler_view);
@@ -113,10 +123,7 @@ public class MainActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         fab.attachToRecyclerView(mRecyclerView);
-        //Pass a new array list; when onStart calls it updates the timeline.
-//        if(!sp.getBoolean("loggedIn",false)){
-//            startActivity(new Intent(this,LoginActivity.class));
-//        }
+
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         mDrawer = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -239,9 +246,9 @@ public class MainActivity extends AppCompatActivity {
         protected ArrayList<TwitterTimelineDataObject> doInBackground(ArrayList<TwitterTimelineDataObject>... params) {
             int index=0;
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
-            List<twitter4j.Status> statuses = timelineHandler.getTimeline();
+            List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
             for (twitter4j.Status status : statuses) {
-                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),status.getText());
+                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),status.getText(), getImageFromURL(status.getUser().getOriginalProfileImageURL()));
                 results.add(index, obj);
                 index++;
             }
@@ -262,5 +269,17 @@ public class MainActivity extends AppCompatActivity {
                                                                                    });
             mSwipeRefreshLayout.setRefreshing(false);
         }
+    }
+    public Bitmap getImageFromURL(String url){
+        try {
+            URL urlConnection = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            return BitmapFactory.decodeStream(connection.getInputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

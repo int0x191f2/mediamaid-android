@@ -70,8 +70,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         //Create the ConnectionDetector
         connectionDetector = new ConnectionDetector(getApplicationContext());
+        if(!connectionDetector.isConnectingToInternet()){
+            Toast.makeText(getApplicationContext(),"No internet connection detected", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class));
+        }
+
         //Create the Twitter Authenticator
         twitterAuth = TwitterAuth.getInstance();
         //Create the timelineHandler
@@ -87,11 +94,13 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("MediaMaid");
 
         sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
+
         //Start the login activity if the user isn't logged in
         if(!sp.getBoolean(BuildVars.SHARED_PREFERENCES_LOGGED_IN_KEY,false)){
             Log.i("MediaMaid", "We weren't logged in OR we just logged in");
             Uri uri = getIntent().getData();
-            if (uri != null && uri.toString().startsWith(BuildVars.TWITTER_OAUTH_CALLBACK)) { //this means we just logged in
+            //this means we just came from the login intent
+            if (uri != null && uri.toString().startsWith(BuildVars.TWITTER_OAUTH_CALLBACK) && uri.getQueryParameter(BuildVars.TWITTER_OAUTH_DENIED)==null) {
                 Log.i("MediaMaid", "We are attempting to log in with the OAuth");
                 String verifier = uri.getQueryParameter(BuildVars.TWITTER_OAUTH_VERIFIER);
                 Log.i("MediaMaid", "verifier: "+verifier);
@@ -101,9 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.putString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY, token.getTokenSecret());
                 editor.putBoolean(BuildVars.SHARED_PREFERENCES_LOGGED_IN_KEY, true);
                 editor.apply();
-            }
-
-            else { //this means we need to log in
+            } else { //this means we need to log in
                 Log.i("MediaMaid", "We really weren't logged in and started the login activity");
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();
@@ -134,17 +141,9 @@ public class MainActivity extends AppCompatActivity {
         mToggle.setDrawerIndicatorEnabled(true);
         mDrawer.setDrawerListener(mToggle);
 
-        /*//Check that the application hasn't run before settings loggedIn to false
-        if(!sp.getBoolean("hasRun",false)){
-            Log.i("MediaMaid","Hasn't run yet");
-            SharedPreferences.Editor e = sp.edit();
-            e.putBoolean("loggedIn",false);
-            e.putBoolean("hasRun",true);
-            e.commit();
-        }*/
-
-        if(!connectionDetector.isConnectingToInternet()){
-            Toast.makeText(getApplicationContext(),"No internet connection",Toast.LENGTH_SHORT).show();
+        //Get the timeline if the user is logged in
+        if(sp.getBoolean("loggedIn",false)){
+            updateTimeline();
         }
     }
 
@@ -153,11 +152,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         //Set up the inital drawer
         updateDrawer();
-
-        //Get the timeline if the user is logged in
-        if(sp.getBoolean("loggedIn",false)){
-            updateTimeline();
-        }
     }
     private void updateDrawer(){
         //Check that the user is logged in and set the drawer label accordingly

@@ -8,6 +8,7 @@ public class BuildVars {
     public final static String TWITTER_CONSUMER_SECRET = "OJhxMo8lk2N801KxG6e3Nyszx6kUQEsezrX4cFCi2IRtRgotY9";
     public final static String TWITTER_OAUTH_CALLBACK = "oauth://com.int0x191f2.mediamaid.MainActivity_OAuthHook";
     public final static String TWITTER_OAUTH_VERIFIER = "oauth_verifier";
+    public final static String TWITTER_OAUTH_DENIED = "denied";
 
     public final static String SHARED_PREFERENCES_ACCESS_TOKEN_KEY = "accessToken";
     public final static String SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY = "accessTokenSecret";

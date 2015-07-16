@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
@@ -16,13 +17,11 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterTweet {
     SharedPreferences sp;
     Context context;
+    Twitter twatter;
 
     public TwitterTweet(Context c){
         context = c;
         sp = context.getSharedPreferences("MediaMaid",0);
-    }
-    public Boolean Send(String message){
-        Twitter twatter;
         ConfigurationBuilder cb = new ConfigurationBuilder();
         TwitterFactory tf;
         cb.setDebugEnabled(true);
@@ -32,6 +31,8 @@ public class TwitterTweet {
         cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret",""));
         tf = new TwitterFactory(cb.build());
         twatter = tf.getInstance();
+    }
+    public Boolean Send(String message){
         try {
             twatter.updateStatus(message);
             Log.i("MediaMaid", "Sending tweet " + message);
@@ -39,6 +40,13 @@ public class TwitterTweet {
         } catch (Exception e) {
             Log.e("MediaMaid",e.toString());
             return false;
+        }
+    }
+    public Status getTweetByID(long id){
+        try {
+            return twatter.tweets().showStatus(id);
+        }catch(Exception e){
+            return null;
         }
     }
 }

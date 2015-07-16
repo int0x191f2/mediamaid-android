@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
             List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
             for (twitter4j.Status status : statuses) {
-                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),status.getText(), twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),String.valueOf(status.getId()),status.getText(), twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
                 results.add(index, obj);
                 index++;
             }
@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                    TwitterTimelineViewAdapter.MyClickListener(){
                                                                                        @Override
                                                                                        public void onItemClick(int pos, View v){
-                                                                                           new TwitterTimelineClickHandler(getApplicationContext()).onItemClick(pos);
+                                                                                           new TwitterTimelineClickHandler(getApplicationContext()).onItemClick(pos, v);
                                                                                        }
                                                                                    });
             mSwipeRefreshLayout.setRefreshing(false);

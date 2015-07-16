@@ -19,12 +19,14 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         CircleImageView profileImage;
         TextView realName;
         TextView userName;
+        TextView tweetID;
         TextView tweetPayload;
         public DataObjectHolder(View itemView){
             super(itemView);
             profileImage = (CircleImageView) itemView.findViewById(R.id.cardViewProfileImage);
             realName = (TextView) itemView.findViewById(R.id.cardViewRealName);
             userName = (TextView) itemView.findViewById(R.id.cardViewUserName);
+            tweetID = (TextView) itemView.findViewById(R.id.cardViewTweetID);
             tweetPayload = (TextView) itemView.findViewById(R.id.cardViewTweetPayload);
             itemView.setOnClickListener(this);
         }
@@ -49,6 +51,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         holder.profileImage.setImageBitmap(dataset.get(position).getProfileImage());
         holder.realName.setText(dataset.get(position).getRealName());
         holder.userName.setText(dataset.get(position).getUserName());
+        holder.tweetID.setText(dataset.get(position).getTweetID());
         holder.tweetPayload.setText(dataset.get(position).getTweetPayload());
     }
     public void addItem(TwitterTimelineDataObject dataObject, int index){

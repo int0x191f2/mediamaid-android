@@ -12,11 +12,13 @@ public class TwitterTimelineDataObject {
     private Bitmap profileImage;
     private String realName;
     private String userName;
+    private String tweetID;
     private String tweetPayload;
-    TwitterTimelineDataObject(String rn, String un, String tp, Bitmap im){
+    TwitterTimelineDataObject(String rn, String un, String ti, String tp, Bitmap im){
         profileImage = im;
         realName = rn;
         userName = un;
+        tweetID = ti;
         tweetPayload = tp;
     }
     public Bitmap getProfileImage() { return profileImage; }
@@ -26,19 +28,18 @@ public class TwitterTimelineDataObject {
     public String getRealName(){
         return realName;
     }
+    public String getTweetID() { return tweetID; }
     public String getTweetPayload(){
         return tweetPayload;
     }
-    public void setProfileImage(Bitmap im) {
-        this.profileImage = im;
-        Log.i("MediaMaid",im.toString());
-    }
+    public void setProfileImage(Bitmap im) { this.profileImage = im; }
     public void setUserName(String un){
         this.userName = un;
     }
     public void setRealName(String rn){
         this.realName = rn;
     }
+    public void setTweetID(String ti) {this.tweetID = ti; }
     public void setTweetPayload(String tp){
         this.tweetPayload = tp;
     }

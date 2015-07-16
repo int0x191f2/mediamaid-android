@@ -16,4 +16,6 @@
     <string name="title_activity_twitter_login">TwitterLoginActivity</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="login_twitter">Login with Twitter</string>
+    <string name="tweet_view_transition">tweet_view_transition</string>
+    <string name="title_activity_twitter_tweet_view">TwitterTweetViewActivity</string>
 </resources>

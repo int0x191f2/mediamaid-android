@@ -14,19 +14,21 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="com.int0x191f2.mediamaid.MainActivity_OAuthHook" android:scheme="oauth" />
-            </intent-filter>
 
+                <data
+                    android:host="com.int0x191f2.mediamaid.MainActivity_OAuthHook"
+                    android:scheme="oauth" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ComposeActivity"
@@ -57,5 +59,10 @@
             android:name=".LoginActivity"
             android:label="MediaMaid" >
         </activity>
+        <activity
+            android:name=".TwitterTweetViewActivity"
+            android:label="@string/title_activity_twitter_tweet_view" >
+        </activity>
     </application>
+
 </manifest>

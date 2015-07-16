@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
 
@@ -20,6 +21,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         TextView realName;
         TextView userName;
         TextView tweetID;
+        ImageView retweetIndicator;
         TextView tweetPayload;
         public DataObjectHolder(View itemView){
             super(itemView);
@@ -27,6 +29,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
             realName = (TextView) itemView.findViewById(R.id.cardViewRealName);
             userName = (TextView) itemView.findViewById(R.id.cardViewUserName);
             tweetID = (TextView) itemView.findViewById(R.id.cardViewTweetID);
+            retweetIndicator = (ImageView) itemView.findViewById(R.id.cardViewRetweetIndicator);
             tweetPayload = (TextView) itemView.findViewById(R.id.cardViewTweetPayload);
             itemView.setOnClickListener(this);
         }
@@ -53,6 +56,11 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         holder.userName.setText(dataset.get(position).getUserName());
         holder.tweetID.setText(dataset.get(position).getTweetID());
         holder.tweetPayload.setText(dataset.get(position).getTweetPayload());
+        if(dataset.get(position).getIsRetweet()){
+            holder.retweetIndicator.setVisibility(View.VISIBLE);
+        }else{
+            holder.retweetIndicator.setVisibility(View.GONE);
+        }
     }
     public void addItem(TwitterTimelineDataObject dataObject, int index){
         dataset.add(dataObject);

@@ -41,6 +41,7 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
             android:onClick="composeDialog"
+            android:src="@drawable/ic_compose"
             fab:elevation="7dp"
             fab:fab_colorNormal="@color/primary_red"
             fab:fab_colorPressed="@color/primary_red_dark"

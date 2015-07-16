@@ -241,7 +241,12 @@ public class MainActivity extends AppCompatActivity {
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
             List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
             for (twitter4j.Status status : statuses) {
-                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),"@"+status.getUser().getScreenName(),String.valueOf(status.getId()),status.getText(), twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
+                        "@"+status.getUser().getScreenName(),
+                        String.valueOf(status.getId()),
+                        status.isRetweet(),
+                        status.getText(),
+                        twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
                 results.add(index, obj);
                 index++;
             }

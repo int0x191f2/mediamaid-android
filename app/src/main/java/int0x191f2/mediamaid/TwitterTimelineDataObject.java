@@ -13,12 +13,14 @@ public class TwitterTimelineDataObject {
     private String realName;
     private String userName;
     private String tweetID;
+    private Boolean isRetweet;
     private String tweetPayload;
-    TwitterTimelineDataObject(String rn, String un, String ti, String tp, Bitmap im){
+    TwitterTimelineDataObject(String rn, String un, String ti, Boolean rt, String tp, Bitmap im){
         profileImage = im;
         realName = rn;
         userName = un;
         tweetID = ti;
+        isRetweet = rt;
         tweetPayload = tp;
     }
     public Bitmap getProfileImage() { return profileImage; }
@@ -29,6 +31,7 @@ public class TwitterTimelineDataObject {
         return realName;
     }
     public String getTweetID() { return tweetID; }
+    public Boolean getIsRetweet() {return isRetweet; }
     public String getTweetPayload(){
         return tweetPayload;
     }
@@ -40,6 +43,7 @@ public class TwitterTimelineDataObject {
         this.realName = rn;
     }
     public void setTweetID(String ti) {this.tweetID = ti; }
+    public void setIsRetweet(Boolean rt) { this.isRetweet = rt; }
     public void setTweetPayload(String tp){
         this.tweetPayload = tp;
     }

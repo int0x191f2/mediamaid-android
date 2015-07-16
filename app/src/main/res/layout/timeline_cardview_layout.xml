@@ -9,6 +9,7 @@
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
     android:clickable="true"
+    android:transitionName="@string/tweet_view_transition"
     card_view:cardElevation="4dp"
     card_view:cardCornerRadius="2dp">
     <LinearLayout
@@ -18,7 +19,7 @@
         android:layout_marginBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <!-- Tweet header: profile picture, name, and username-->
+        <!-- Tweet header: profile picture, name, username, and show images button-->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -51,6 +52,17 @@
                 android:id="@+id/cardViewTweetID"
                 android:layout_width="0dp"
                 android:layout_height="0dp" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center|end"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/cardViewRetweetIndicator"
+                    android:src="@drawable/ic_action"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp" />
+            </LinearLayout>
         </LinearLayout>
         <TextView
             android:id="@+id/cardViewTweetPayload"
@@ -58,5 +70,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+        <LinearLayout
+            android:id="@+id/cardViewActionBar"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_compose"/>
+        </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>

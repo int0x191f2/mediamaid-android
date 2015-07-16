@@ -40,7 +40,7 @@ public class TwitterPictureCacheHandler {
         }
     }
 
-    public boolean isInCache(String name){
+    private boolean isInCache(String name){
         try{
             FileInputStream fis = context.openFileInput(name);
             if(fis.available()!=0){
@@ -54,7 +54,7 @@ public class TwitterPictureCacheHandler {
         }
     }
 
-    public void writeToCache(String name, Bitmap bm){
+    private void writeToCache(String name, Bitmap bm){
         try {
             FileOutputStream fos = context.openFileOutput(name, Context.MODE_PRIVATE);
             bm.compress(Bitmap.CompressFormat.PNG,100,fos);
@@ -67,7 +67,7 @@ public class TwitterPictureCacheHandler {
         }
     }
 
-    public Bitmap getImageFromURL(String url){
+    private Bitmap getImageFromURL(String url){
         try {
             URL urlConnection = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();

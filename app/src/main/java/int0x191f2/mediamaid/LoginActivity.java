@@ -17,6 +17,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
+
 import twitter4j.Twitter;
 
 public class LoginActivity extends AppCompatActivity {
@@ -37,6 +39,8 @@ public class LoginActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Login");
     }
     public void twitterLogin(View v) {
+        CircularProgressView circularProgressView = (CircularProgressView) findViewById(R.id.loginCircleProgressView);
+        circularProgressView.startAnimation();
         twitterAuth.generateOAuthRequestToken();
         this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(twitterAuth.getOAuthRequestToken().getAuthorizationURL())));
         finish();

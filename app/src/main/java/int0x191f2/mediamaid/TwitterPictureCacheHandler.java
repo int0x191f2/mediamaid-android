@@ -39,6 +39,7 @@ public class TwitterPictureCacheHandler {
             return bm;
         }
     }
+
     public boolean isInCache(String name){
         try{
             FileInputStream fis = context.openFileInput(name);
@@ -52,6 +53,7 @@ public class TwitterPictureCacheHandler {
             return false;
         }
     }
+
     public void writeToCache(String name, Bitmap bm){
         try {
             FileOutputStream fos = context.openFileOutput(name, Context.MODE_PRIVATE);
@@ -64,6 +66,7 @@ public class TwitterPictureCacheHandler {
             Log.e("MediaMaid",e.toString());
         }
     }
+
     public Bitmap getImageFromURL(String url){
         try {
             URL urlConnection = new URL(url);

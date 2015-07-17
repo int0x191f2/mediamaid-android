@@ -141,6 +141,9 @@ public class MainActivity extends AppCompatActivity {
         mToggle.setDrawerIndicatorEnabled(true);
         mDrawer.setDrawerListener(mToggle);
 
+        BuildVars.TWITTER_ACCESS_TOKEN_KEY = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_KEY,"");
+        BuildVars.TWITTER_ACCESS_TOKEN_SECRET = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY,"");
+
         //Get the timeline if the user is logged in
         if(sp.getBoolean("loggedIn",false)){
             updateTimeline();

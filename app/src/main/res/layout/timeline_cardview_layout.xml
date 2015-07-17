@@ -59,7 +59,7 @@
                 android:layout_height="match_parent">
                 <ImageView
                     android:id="@+id/cardViewRetweetIndicator"
-                    android:src="@drawable/ic_action"
+                    android:src="@drawable/ic_retweet"
                     android:layout_width="28dp"
                     android:layout_height="28dp" />
             </LinearLayout>
@@ -76,10 +76,13 @@
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:src="@drawable/ic_compose"/>
+            <ImageButton
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:id="@+id/cardViewActionRetweet"
+                android:src="@drawable/ic_retweet"/>
         </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>

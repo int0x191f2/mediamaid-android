@@ -1,5 +1,7 @@
 package int0x191f2.mediamaid;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -11,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +21,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private CircleImageView mCircleImageView;
+    private CardView mCardView;
 
 
     public void composeDialog(View view) {
@@ -59,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateTimeline(){
+        startTimelineOutAnimation();
         new GetDataSet().execute(new ArrayList<TwitterTimelineDataObject>());
     }
 
@@ -121,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         mCircleImageView = (CircleImageView) findViewById(R.id.cardViewProfileImage);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.timelineRefreshLayout);
         fab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab);
+        mCardView = (CardView) findViewById(R.id.card_view);
         mRecyclerView = (RecyclerView) findViewById(R.id.timeline_recycler_view);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -247,6 +256,8 @@ public class MainActivity extends AppCompatActivity {
                 TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
                         "@"+status.getUser().getScreenName(),
                         String.valueOf(status.getId()),
+                        //TODO make the date/time work
+                        "$(date)",
                         status.isRetweet(),
                         status.isRetweetedByMe(),
                         status.getText(),
@@ -270,18 +281,26 @@ public class MainActivity extends AppCompatActivity {
                                                                                        }
                                                                                    });
             mSwipeRefreshLayout.setRefreshing(false);
+            startTimelineInAnimation();
         }
     }
-    public Bitmap getImageFromURL(String url){
-        try {
-            URL urlConnection = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            return BitmapFactory.decodeStream(connection.getInputStream());
-        } catch (Exception e) {
-            e.printStackTrace();
+
+    public void startTimelineInAnimation(){
+        TranslateAnimation anim = new TranslateAnimation(-2*mRecyclerView.getWidth(),0,0,0);
+        anim.setDuration(1000);
+        mRecyclerView.startAnimation(anim);
+    }
+    public void startTimelineOutAnimation(){
+        TranslateAnimation anim = new TranslateAnimation(0,2*mRecyclerView.getWidth(),0,0);
+        anim.setDuration(1000);
+        mRecyclerView.startAnimation(anim);
+    }
+    public boolean checkAuthentication(){
+        try{
+            timelineHandler.getTimeline(1);
+            return true;
+        }catch(Exception e){
+            return false;
         }
-        return null;
     }
 }

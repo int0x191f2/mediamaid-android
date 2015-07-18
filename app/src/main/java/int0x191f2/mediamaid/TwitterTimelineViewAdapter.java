@@ -1,11 +1,13 @@
 package int0x191f2.mediamaid;
 
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,6 +34,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         TextView realName;
         TextView userName;
         TextView tweetID;
+        TextView tweetDate;
         ImageView retweetIndicator;
         TextView tweetPayload;
         ImageButton actionRetweet;
@@ -42,6 +45,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
             realName = (TextView) itemView.findViewById(R.id.cardViewRealName);
             userName = (TextView) itemView.findViewById(R.id.cardViewUserName);
             tweetID = (TextView) itemView.findViewById(R.id.cardViewTweetID);
+            tweetDate = (TextView) itemView.findViewById(R.id.cardViewTweetDate);
             retweetIndicator = (ImageView) itemView.findViewById(R.id.cardViewRetweetIndicator);
             tweetPayload = (TextView) itemView.findViewById(R.id.cardViewTweetPayload);
             actionRetweet = (ImageButton) itemView.findViewById(R.id.cardViewActionRetweet);
@@ -84,6 +88,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         holder.realName.setText(dataset.get(position).getRealName());
         holder.userName.setText(dataset.get(position).getUserName());
         holder.tweetID.setText(dataset.get(position).getTweetID());
+        holder.tweetDate.setText(dataset.get(position).getTweetDate());
         holder.tweetPayload.setText(dataset.get(position).getTweetPayload());
 
         //Check if the tweet is on the timeline because it was retweeted

@@ -248,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
                         "@"+status.getUser().getScreenName(),
                         String.valueOf(status.getId()),
                         status.isRetweet(),
+                        status.isRetweetedByMe(),
                         status.getText(),
                         twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
                 results.add(index, obj);

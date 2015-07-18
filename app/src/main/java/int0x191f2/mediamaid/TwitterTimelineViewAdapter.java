@@ -76,20 +76,10 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         tf = new TwitterFactory(cb.build());
         twatter = tf.getInstance();
         final Long id = Long.valueOf(dataset.get(position).getTweetID()).longValue();
-
-        //Check if the tweet has already been retweeted/favorited and set the icon if it is
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try{
-                    Status status = twatter.tweets().showStatus(id);
-                    if(status.isRetweetedByMe()){
-                        holder.actionRetweet.setImageResource(R.drawable.ic_retweet_true);
-                    }
-                }catch(Exception e){
-                }
-            }
-        }).start();
+        
+        if(dataset.get(position).getIsRetweetByMe()) {
+            holder.actionRetweet.setImageResource(R.drawable.ic_retweet_true);
+        }
         holder.profileImage.setImageBitmap(dataset.get(position).getProfileImage());
         holder.realName.setText(dataset.get(position).getRealName());
         holder.userName.setText(dataset.get(position).getUserName());
@@ -107,9 +97,6 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         holder.actionRetweet.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
                         try {
                             Status status = twatter.tweets().showStatus(id);
                             if(status.isRetweetedByMe()){
@@ -123,9 +110,6 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
                         } catch (Exception e) {}
                         Log.i("MediaMaid", "clicked da button");
                         //if the user clicked the button, the cardViewActionBar must be visible so no need to check for it being open
-                    }
-                }).start();
-
                 holder.cardViewActionBar.setVisibility(View.GONE);
             }
         });

@@ -22,7 +22,6 @@ public class TwitterAuth {
     private AccessToken accessToken;
     private ConfigurationBuilder cb = new ConfigurationBuilder();
     private Twitter twatter;
-    //private Context context;
 
     public static TwitterAuth instance = new TwitterAuth();
 

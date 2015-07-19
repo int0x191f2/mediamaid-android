@@ -43,14 +43,7 @@ public class TwitterTimelineHandler {
         return statuses.get(index);
     }
     public void refreshTimeline() {
-        sp = context.getSharedPreferences("MediaMaid", 0);
-        cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true);
-        cb.setOAuthConsumerKey(BuildVars.TWITTER_CONSUMER_KEY);
-        cb.setOAuthConsumerSecret(BuildVars.TWITTER_CONSUMER_SECRET);
-        cb.setOAuthAccessToken(sp.getString("accessToken", ""));
-        cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret", ""));
-        tf = new TwitterFactory(cb.build());
+        tf = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build());
         twitter = tf.getInstance();
         try {
             statuses = twitter.getHomeTimeline(page);

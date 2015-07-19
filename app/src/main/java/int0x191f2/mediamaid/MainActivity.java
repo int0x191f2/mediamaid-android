@@ -288,45 +288,39 @@ public class MainActivity extends AppCompatActivity {
                                                                                        }
                                                                                    });
 
-            StatusListener listener = new StatusListener() {
-                @Override
-                public void onStatus(twitter4j.Status status) {
-                    TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
-                            status.getUser().getScreenName(),
-                            String.valueOf(status.getId()),
-                            //TODO make the date/time work
-                            "$(date)",
-                            status.isRetweet(),
-                            status.isRetweetedByMe(),
-                            status.getText(),
-                            twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
-                    ((TwitterTimelineViewAdapter) mAdapter).addItem(obj,mAdapter.getItemCount()+1);
-                }
-
-                @Override
-                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {}
-                @Override
-                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {}
-                @Override
-                public void onScrubGeo(long userId, long upToStatusId) {}
-                @Override
-                public void onStallWarning(StallWarning warning) {}
-                @Override
-                public void onException(Exception ex) {
-                    Log.e("MediaMaid",ex.toString());
-                }
-            };
-            ConfigurationBuilder cb = new ConfigurationBuilder();
-            TwitterStreamFactory twitterStreamFactory;
-            cb.setDebugEnabled(true);
-            cb.setOAuthConsumerKey(BuildVars.TWITTER_CONSUMER_KEY);
-            cb.setOAuthConsumerSecret(BuildVars.TWITTER_CONSUMER_SECRET);
-            cb.setOAuthAccessToken(sp.getString("accessToken",""));
-            cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret",""));
-            twitterStreamFactory = new TwitterStreamFactory(cb.build());
-            TwitterStream twitterStream = twitterStreamFactory.getInstance();
-            twitterStream.addListener(listener);
-            twitterStream.sample();
+//            StatusListener listener = new StatusListener() {
+//                @Override
+//                public void onStatus(twitter4j.Status status) {
+//                    TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
+//                            status.getUser().getScreenName(),
+//                            String.valueOf(status.getId()),
+//                            //TODO make the date/time work
+//                            "$(date)",
+//                            status.isRetweet(),
+//                            status.isRetweetedByMe(),
+//                            status.getText(),
+//                            twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+//                    ((TwitterTimelineViewAdapter) mAdapter).addItem(obj,mAdapter.getItemCount()+1);
+//                }
+//
+//                @Override
+//                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {}
+//                @Override
+//                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {}
+//                @Override
+//                public void onScrubGeo(long userId, long upToStatusId) {}
+//                @Override
+//                public void onStallWarning(StallWarning warning) {}
+//                @Override
+//                public void onException(Exception ex) {
+//                    Log.e("MediaMaid",ex.toString());
+//                }
+//            };
+//            TwitterStreamFactory twitterStreamFactory;
+//            twitterStreamFactory = new TwitterStreamFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build());
+//            TwitterStream twitterStream = twitterStreamFactory.getInstance();
+//            twitterStream.addListener(listener);
+//            twitterStream.sample();
             mSwipeRefreshLayout.setRefreshing(false);
             startTimelineInAnimation();
         }

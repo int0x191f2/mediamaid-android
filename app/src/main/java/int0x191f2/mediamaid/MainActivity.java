@@ -26,6 +26,7 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -37,9 +38,12 @@ import java.util.List;
 import java.util.ArrayList;
 import android.util.Log;
 
+import org.apache.http.StatusLine;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
+import twitter4j.conf.ConfigurationBuilder;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -125,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        //Set up the recyclerview and fab integr\ation
+        //Set up the recyclerview and fab integration
         mCircleImageView = (CircleImageView) findViewById(R.id.cardViewProfileImage);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.timelineRefreshLayout);
         fab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab);
@@ -246,15 +250,18 @@ public class MainActivity extends AppCompatActivity {
         TwitterAuth.resetInstance();
         twitterAuth = TwitterAuth.getInstance();
     }
+
     private class GetDataSet extends AsyncTask<ArrayList<TwitterTimelineDataObject>,Integer,ArrayList<TwitterTimelineDataObject>>{
+
         @Override
         protected ArrayList<TwitterTimelineDataObject> doInBackground(ArrayList<TwitterTimelineDataObject>... params) {
             int index=0;
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
             List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
+
             for (twitter4j.Status status : statuses) {
                 TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
-                        "@"+status.getUser().getScreenName(),
+                        status.getUser().getScreenName(),
                         String.valueOf(status.getId()),
                         //TODO make the date/time work
                         "$(date)",
@@ -280,6 +287,46 @@ public class MainActivity extends AppCompatActivity {
                                                                                            new TwitterTimelineClickHandler(getApplicationContext()).onItemClick(pos, v);
                                                                                        }
                                                                                    });
+
+            StatusListener listener = new StatusListener() {
+                @Override
+                public void onStatus(twitter4j.Status status) {
+                    TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
+                            status.getUser().getScreenName(),
+                            String.valueOf(status.getId()),
+                            //TODO make the date/time work
+                            "$(date)",
+                            status.isRetweet(),
+                            status.isRetweetedByMe(),
+                            status.getText(),
+                            twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+                    ((TwitterTimelineViewAdapter) mAdapter).addItem(obj,mAdapter.getItemCount()+1);
+                }
+
+                @Override
+                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {}
+                @Override
+                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {}
+                @Override
+                public void onScrubGeo(long userId, long upToStatusId) {}
+                @Override
+                public void onStallWarning(StallWarning warning) {}
+                @Override
+                public void onException(Exception ex) {
+                    Log.e("MediaMaid",ex.toString());
+                }
+            };
+            ConfigurationBuilder cb = new ConfigurationBuilder();
+            TwitterStreamFactory twitterStreamFactory;
+            cb.setDebugEnabled(true);
+            cb.setOAuthConsumerKey(BuildVars.TWITTER_CONSUMER_KEY);
+            cb.setOAuthConsumerSecret(BuildVars.TWITTER_CONSUMER_SECRET);
+            cb.setOAuthAccessToken(sp.getString("accessToken",""));
+            cb.setOAuthAccessTokenSecret(sp.getString("accessTokenSecret",""));
+            twitterStreamFactory = new TwitterStreamFactory(cb.build());
+            TwitterStream twitterStream = twitterStreamFactory.getInstance();
+            twitterStream.addListener(listener);
+            twitterStream.sample();
             mSwipeRefreshLayout.setRefreshing(false);
             startTimelineInAnimation();
         }
@@ -290,11 +337,13 @@ public class MainActivity extends AppCompatActivity {
         anim.setDuration(1000);
         mRecyclerView.startAnimation(anim);
     }
+
     public void startTimelineOutAnimation(){
         TranslateAnimation anim = new TranslateAnimation(0,2*mRecyclerView.getWidth(),0,0);
         anim.setDuration(1000);
         mRecyclerView.startAnimation(anim);
     }
+
     public boolean checkAuthentication(){
         try{
             timelineHandler.getTimeline(1);

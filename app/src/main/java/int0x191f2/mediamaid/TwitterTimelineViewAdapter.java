@@ -86,7 +86,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         }
         holder.profileImage.setImageBitmap(dataset.get(position).getProfileImage());
         holder.realName.setText(dataset.get(position).getRealName());
-        holder.userName.setText(dataset.get(position).getUserName());
+        holder.userName.setText("@"+dataset.get(position).getUserName());
         holder.tweetID.setText(dataset.get(position).getTweetID());
         holder.tweetDate.setText(dataset.get(position).getTweetDate());
         holder.tweetPayload.setText(dataset.get(position).getTweetPayload());
@@ -97,6 +97,13 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         }else{
             holder.retweetIndicator.setVisibility(View.GONE);
         }
+
+        holder.profileImage.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Log.i("MediaMaid",dataset.get(position).getUserName());
+            }
+        });
 
         //Favorite button click listener
         holder.actionRetweet.setOnClickListener(new View.OnClickListener(){
@@ -118,6 +125,10 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
                 holder.cardViewActionBar.setVisibility(View.GONE);
             }
         });
+
+        //Profile button onClick
+
+
     }
     public void addItem(TwitterTimelineDataObject dataObject, int index){
         dataset.add(dataObject);

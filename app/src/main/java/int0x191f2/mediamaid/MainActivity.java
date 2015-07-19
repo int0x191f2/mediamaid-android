@@ -44,6 +44,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
+import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -281,9 +282,9 @@ public class MainActivity extends AppCompatActivity {
             mAdapter = new TwitterTimelineViewAdapter(twitterTimelineDataObjects);
             mRecyclerView.setAdapter(mAdapter);
             ((TwitterTimelineViewAdapter) mAdapter).setItemOnClickListener(new
-                                                                                   TwitterTimelineViewAdapter.MyClickListener(){
+                                                                                   TwitterTimelineViewAdapter.MyClickListener() {
                                                                                        @Override
-                                                                                       public void onItemClick(int pos, View v){
+                                                                                       public void onItemClick(int pos, View v) {
                                                                                            new TwitterTimelineClickHandler(getApplicationContext()).onItemClick(pos, v);
                                                                                        }
                                                                                    });

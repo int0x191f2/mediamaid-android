@@ -1,6 +1,8 @@
 package int0x191f2.mediamaid;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -98,13 +100,6 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
             holder.retweetIndicator.setVisibility(View.GONE);
         }
 
-        holder.profileImage.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Log.i("MediaMaid",dataset.get(position).getUserName());
-            }
-        });
-
         //Favorite button click listener
         holder.actionRetweet.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -127,6 +122,14 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         });
 
         //Profile button onClick
+        holder.profileImage.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(v.getContext(),TwitterProfileViewActivity.class);
+                v.getContext().startActivity(intent);
+                Log.i("MediaMaid",dataset.get(position).getUserName());
+            }
+        });
 
 
     }

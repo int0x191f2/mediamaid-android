@@ -43,6 +43,7 @@ public class TwitterTimelineHandler {
         return statuses.get(index);
     }
     public void refreshTimeline() {
+        MediaMaidConfigurationBuilder.resetInstance();
         tf = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build());
         twitter = tf.getInstance();
         try {

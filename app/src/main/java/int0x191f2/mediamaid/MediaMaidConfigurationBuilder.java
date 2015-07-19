@@ -8,7 +8,7 @@ import twitter4j.conf.ConfigurationBuilder;
  * Created by ip4gjb on 7/19/15.
  */
 public class MediaMaidConfigurationBuilder {
-    public ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+    public ConfigurationBuilder configurationBuilder;
     public static MediaMaidConfigurationBuilder instance = new MediaMaidConfigurationBuilder();
 
     public static void resetInstance() { instance = new MediaMaidConfigurationBuilder(); }
@@ -17,6 +17,7 @@ public class MediaMaidConfigurationBuilder {
 
     public MediaMaidConfigurationBuilder(){
         try{
+            configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.setOAuthConsumerKey(BuildVars.TWITTER_CONSUMER_KEY);
             configurationBuilder.setOAuthConsumerSecret(BuildVars.TWITTER_CONSUMER_SECRET);
             configurationBuilder.setOAuthAccessToken(BuildVars.TWITTER_ACCESS_TOKEN_KEY);

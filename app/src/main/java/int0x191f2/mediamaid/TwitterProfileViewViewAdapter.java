@@ -13,18 +13,15 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import twitter4j.*;
 import de.hdodenhof.circleimageview.CircleImageView;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.ConfigurationBuilder;
 
 /**
- * Created by ip4gjb on 7/7/15.
+ * Created by ip4gjb on 7/21/15.
  */
-public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTimelineViewAdapter.DataObjectHolder>{
-    private MyClickListener clickListener;
-    private ArrayList<TwitterTimelineDataObject> dataset;
+public class TwitterProfileViewViewAdapter extends RecyclerView.Adapter<TwitterProfileViewViewAdapter.DataObjectHolder> {
+    private ProfileViewClickListener clickListener;
+    private ArrayList<TwitterProfileViewDataObject> dataset;
     public class DataObjectHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         LinearLayout cardViewActionBar;
         CircleImageView profileImage;
@@ -49,35 +46,25 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
             itemView.setOnClickListener(this);
         }
         @Override
-        public void onClick(View v){
-            clickListener.onItemClick(getPosition(),v);
-        }
+        public void onClick(View v) { clickListener.onItemClick(getPosition(),v); }
     }
-    public void setItemOnClickListener(MyClickListener clickListener){
+    public void setItemOnClickListener(ProfileViewClickListener clickListener){
         this.clickListener = clickListener;
     }
     @Override
-    public DataObjectHolder onCreateViewHolder(ViewGroup parent,
-                                               int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.twitter_card_view_layout, parent, false);
+    public DataObjectHolder onCreateViewHolder(ViewGroup parent, int viewType){
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.twitter_card_view_layout,parent,false);
         DataObjectHolder dataObjectHolder = new DataObjectHolder(view);
         return dataObjectHolder;
     }
     @Override
     public void onBindViewHolder(final DataObjectHolder holder, final int position){
         final Twitter twatter;
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        TwitterFactory tf;
-        cb.setDebugEnabled(true);
-        cb.setOAuthConsumerKey(BuildVars.TWITTER_CONSUMER_KEY);
-        cb.setOAuthConsumerSecret(BuildVars.TWITTER_CONSUMER_SECRET);
-        cb.setOAuthAccessToken(BuildVars.TWITTER_ACCESS_TOKEN_KEY);
-        cb.setOAuthAccessTokenSecret(BuildVars.TWITTER_ACCESS_TOKEN_SECRET);
-        tf = new TwitterFactory(cb.build());
-        twatter = tf.getInstance();
+        MediaMaidConfigurationBuilder.resetInstance();
+        twatter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+
         final Long id = Long.valueOf(dataset.get(position).getTweetID()).longValue();
-        
+
         if(dataset.get(position).getIsRetweetByMe()) {
             holder.actionRetweet.setImageResource(R.drawable.ic_retweet_true);
         }
@@ -95,42 +82,14 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
             holder.retweetIndicator.setVisibility(View.GONE);
         }
 
-        //Favorite button click listener
-        holder.actionRetweet.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                        try {
-                            Status status = twatter.tweets().showStatus(id);
-                            if(status.isRetweetedByMe()){
-                                twatter.destroyStatus(status.getCurrentUserRetweetId());
-                                dataset.get(position).setIsRetweetByMe(false);
-                                holder.actionRetweet.setImageResource(R.drawable.ic_retweet);
-                            }else{
-                                twatter.retweetStatus(id);
-                                dataset.get(position).setIsRetweetByMe(true);
-                                holder.actionRetweet.setImageResource(R.drawable.ic_retweet_true);
-                            }
-
-                        } catch (Exception e) {}
-                        Log.i("MediaMaid", "clicked da button");
-                        //if the user clicked the button, the cardViewActionBar must be visible so no need to check for it being open
-                holder.cardViewActionBar.setVisibility(View.GONE);
-            }
-        });
-
         //Profile button onClick
         holder.profileImage.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent intent = new Intent(v.getContext(),TwitterProfileViewActivity.class);
-                v.getContext().startActivity(intent);
-                Log.i("MediaMaid",dataset.get(position).getUserName());
             }
         });
-
-
     }
-    public void addItem(TwitterTimelineDataObject dataObject, int index){
+    public void addItem(TwitterProfileViewDataObject dataObject, int index){
         dataset.add(dataObject);
         notifyItemInserted(index);
     }
@@ -138,14 +97,12 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         dataset.remove(index);
         notifyItemRemoved(index);
     }
-    public TwitterTimelineViewAdapter(ArrayList<TwitterTimelineDataObject> dataset){
+    public TwitterProfileViewViewAdapter(ArrayList<TwitterProfileViewDataObject> dataset){
         this.dataset = dataset;
     }
-    public interface MyClickListener{
+    public interface ProfileViewClickListener{
         public void onItemClick(int position, View v);
     }
     @Override
-    public int getItemCount() {
-        return dataset.size();
-    }
+    public int getItemCount() { return dataset.size(); }
 }

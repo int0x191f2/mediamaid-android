@@ -65,7 +65,7 @@
         </activity>
         <activity
             android:name=".TwitterProfileViewActivity"
-            android:label="@string/title_activity_twitter_profile_view" >
+            android:label="@string/title_activity_twitter_profile_view">
         </activity>
     </application>
 

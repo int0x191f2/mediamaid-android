@@ -28,26 +28,36 @@ public class TwitterTimelineHandler {
     Twitter twitter;
     ConfigurationBuilder cb;
     TwitterFactory tf;
-    Paging page;
-    private List<Status> statuses;
+    private List<Status> homeTimelineStatuses,userTimelineStatuses;
     public TwitterTimelineHandler(Context c){
         context = c;
     }
     public List<Status> getTimeline(int count){
-        page = new Paging(1,count);
-        refreshTimeline();
-        return statuses;
+        Paging page = new Paging(1,count);
+        refreshTimeline(page);
+        return homeTimelineStatuses;
     }
-    public Status getTimelineByIndex(int index){
-        refreshTimeline();
-        return statuses.get(index);
+    public List<Status> getUserTimeline(int count, String handle){
+        Paging page = new Paging(1,count);
+        refreshUserTimeline(page, handle);
+        return userTimelineStatuses;
     }
-    public void refreshTimeline() {
+    public void refreshUserTimeline(Paging pager, String handle){
         MediaMaidConfigurationBuilder.resetInstance();
         tf = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build());
         twitter = tf.getInstance();
         try {
-            statuses = twitter.getHomeTimeline(page);
+            userTimelineStatuses = twitter.getUserTimeline(handle,pager);
+        }catch(Exception e){
+            Log.e("MediaMaid","Unable to refresh user ("+handle+") timeline "+e.toString());
+        }
+    }
+    public void refreshTimeline(Paging pager) {
+        MediaMaidConfigurationBuilder.resetInstance();
+        tf = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build());
+        twitter = tf.getInstance();
+        try {
+            homeTimelineStatuses = twitter.getHomeTimeline(pager);
         } catch (Exception e) {
             Log.e("MediaMaid","Unable to refresh timeline "+e.toString());
         }

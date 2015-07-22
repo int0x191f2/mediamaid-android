@@ -123,6 +123,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
             @Override
             public void onClick(View v){
                 Intent intent = new Intent(v.getContext(),TwitterProfileViewActivity.class);
+                intent.putExtra("id",dataset.get(position).getTweetID());
                 v.getContext().startActivity(intent);
                 Log.i("MediaMaid",dataset.get(position).getUserName());
             }

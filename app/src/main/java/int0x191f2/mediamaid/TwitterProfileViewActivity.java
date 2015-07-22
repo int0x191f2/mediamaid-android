@@ -17,31 +17,42 @@ import java.util.List;
 
 import twitter4j.Status;
 import int0x191f2.mediamaid.TwitterProfileViewViewAdapter.ProfileViewClickListener;
+import twitter4j.TwitterFactory;
+import twitter4j.Twitter;
+
 import android.util.Log;
 
 
 public class TwitterProfileViewActivity extends ActionBarActivity {
+    private String userHandle;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private CardView mCardView;
+    private Twitter twitter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_twitter_profile_view);
 
+        MediaMaidConfigurationBuilder.resetInstance();
+        twitter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+
+        String userID = getIntent().getStringExtra("id");
+        Long id = Long.valueOf(userID).longValue();
+        try {
+            Status st = twitter.showStatus(id);
+            userHandle = st.getUser().getScreenName();
+        }catch(Exception e){
+            Log.e("MediaMaid","Exception when getting user handle:"+e.toString());
+        }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.twitterProfileViewRecyclerView);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         updateTimeline();
-
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.twitterProfileViewCollapsingToolbarLayout);
-        if(collapsingToolbarLayout != null){
-            collapsingToolbarLayout.setTitle("title");
-        }
     }
 
     @Override
@@ -62,7 +73,7 @@ public class TwitterProfileViewActivity extends ActionBarActivity {
         protected ArrayList<TwitterProfileViewDataObject> doInBackground(ArrayList<TwitterProfileViewDataObject>... params) {
             int index=0;
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
-            List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
+            List<twitter4j.Status> statuses = timelineHandler.getUserTimeline(20,userHandle);
 
             for (twitter4j.Status status : statuses) {
                 TwitterProfileViewDataObject obj = new TwitterProfileViewDataObject(status.getUser().getName(),

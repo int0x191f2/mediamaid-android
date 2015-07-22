@@ -24,7 +24,7 @@ import android.util.Log;
 
 
 public class TwitterProfileViewActivity extends ActionBarActivity {
-    private String userHandle;
+    private String userHandle, userName;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -44,9 +44,19 @@ public class TwitterProfileViewActivity extends ActionBarActivity {
         try {
             Status st = twitter.showStatus(id);
             userHandle = st.getUser().getScreenName();
+            userName = st.getUser().getName();
         }catch(Exception e){
             Log.e("MediaMaid","Exception when getting user handle:"+e.toString());
         }
+
+        //Set the toolbar title and color
+        Toolbar tb = (Toolbar) findViewById(R.id.profileViewToolbar);
+        tb.setTitleTextColor(0xFFFFFFFF);
+        if(tb!=null){
+            setSupportActionBar(tb);
+        }
+        getSupportActionBar().setTitle(userName);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.twitterProfileViewRecyclerView);
         mRecyclerView.setHasFixedSize(true);

@@ -66,6 +66,9 @@
         <activity
             android:name=".TwitterProfileViewActivity"
             android:label="@string/title_activity_twitter_profile_view">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="int0x191f2.mediamaid.MainActivity" />
         </activity>
     </application>
 

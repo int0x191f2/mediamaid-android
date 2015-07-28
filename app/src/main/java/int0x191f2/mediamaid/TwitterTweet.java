@@ -32,7 +32,11 @@ public class TwitterTweet {
         tf = new TwitterFactory(cb.build());
         twatter = tf.getInstance();
     }
-    public Boolean Send(String message){
+    public Boolean send(String message){
+        if(checkTweetLanguage(message)){
+            Log.i("MediaMaid","Filter word found in tweet");
+            return false;
+        }
         try {
             twatter.updateStatus(message);
             Log.i("MediaMaid", "Sending tweet " + message);
@@ -41,6 +45,10 @@ public class TwitterTweet {
             Log.e("MediaMaid",e.toString());
             return false;
         }
+    }
+    public Boolean checkTweetLanguage(String message){
+        String filterwords = sp.getString(BuildVars.SHARED_PREFERENCES_FILTER_LIST_KEY,"");
+        return message.toLowerCase().contains(filterwords.toLowerCase());
     }
     public Status getTweetByID(long id){
         try {

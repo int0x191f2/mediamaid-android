@@ -48,7 +48,7 @@ import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
-    public String[] drawerItems = {"Login"};
+    public String[] drawerItems = {"Login","Settings"};
     private static SharedPreferences sp;
     private TwitterAuth twitterAuth;
     private TwitterPictureCacheHandler twitterPictureCacheHandler;
@@ -239,6 +239,9 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 Toast.makeText(getApplicationContext(),"No internet connection detected", Toast.LENGTH_SHORT).show();
             }
+        }
+        if(position==1){
+            startActivity(new Intent(this,SettingsActivity.class));
         }
     }
 

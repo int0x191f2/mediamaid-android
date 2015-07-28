@@ -13,6 +13,7 @@ public class BuildVars {
     public final static String SHARED_PREFERENCES_ACCESS_TOKEN_KEY = "accessToken";
     public final static String SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY = "accessTokenSecret";
     public final static String SHARED_PREFERENCES_LOGGED_IN_KEY = "loggedIn";
+    public final static String SHARED_PREFERENCES_FILTER_LIST_KEY = "filterList";
 
     public static String TWITTER_ACCESS_TOKEN_KEY = "";
     public static String TWITTER_ACCESS_TOKEN_SECRET = "";

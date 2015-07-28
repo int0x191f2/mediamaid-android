@@ -42,7 +42,7 @@ public class ComposeActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.sendMessage) {
-            Boolean didSend = twitterTweeter.Send(((EditText)(findViewById(R.id.composeMessageInput))).getText().toString());
+            Boolean didSend = twitterTweeter.send(((EditText)(findViewById(R.id.composeMessageInput))).getText().toString());
             if(!(((EditText)(findViewById(R.id.composeMessageInput))).getText().toString().isEmpty())) {
                 if (didSend) {
                     finish();

@@ -254,17 +254,21 @@ public class MainActivity extends AppCompatActivity {
             List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
 
             for (twitter4j.Status status : statuses) {
-                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
-                        status.getUser().getScreenName(),
-                        String.valueOf(status.getId()),
-                        //TODO make the date/time work
-                        "$(date)",
-                        status.isRetweet(),
-                        status.isRetweetedByMe(),
-                        status.getText(),
-                        twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
-                results.add(index, obj);
-                index++;
+                if(MediaMaidFilteringHandler.getInstance().checkTweetLanguageIsAppropriate(status.getText(),
+                        sp.getString(BuildVars.SHARED_PREFERENCES_FILTER_LIST_KEY,""))) {
+                            TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
+                                    status.getUser().getScreenName(),
+                                    String.valueOf(status.getId()),
+                                    //TODO make the date/time work
+                                    "$(date)",
+                                    status.isRetweet(),
+                                    status.isRetweetedByMe(),
+                                    status.getText(),
+                                    twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+
+                            results.add(index, obj);
+                            index++;
+                }
             }
             return results;
         }
@@ -323,13 +327,13 @@ public class MainActivity extends AppCompatActivity {
     public void startTimelineInAnimation(){
         TranslateAnimation anim = new TranslateAnimation(-2*mRecyclerView.getWidth(),0,0,0);
         anim.setDuration(1000);
-        mRecyclerView.startAnimation(anim);
+        //mRecyclerView.startAnimation(anim);
     }
 
     public void startTimelineOutAnimation(){
         TranslateAnimation anim = new TranslateAnimation(0,2*mRecyclerView.getWidth(),0,0);
         anim.setDuration(1000);
-        mRecyclerView.startAnimation(anim);
+        //mRecyclerView.startAnimation(anim);
     }
 
     public boolean checkAuthentication(){

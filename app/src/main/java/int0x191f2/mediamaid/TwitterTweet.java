@@ -36,8 +36,9 @@ public class TwitterTweet {
         twatter = tf.getInstance();
     }
     public Boolean send(String message){
-        if(!checkTweetLanguageIsAppropriate(message)){
-            return false;
+        if(MediaMaidFilteringHandler.getInstance().checkTweetLanguageIsAppropriate(message,
+                sp.getString(BuildVars.SHARED_PREFERENCES_FILTER_LIST_KEY,""))){
+                    return false;
         }
         try {
             twatter.updateStatus(message);
@@ -48,22 +49,7 @@ public class TwitterTweet {
             return false;
         }
     }
-    public Boolean checkTweetLanguageIsAppropriate(String message){
-        Boolean isAppropriate = true;
-        String filterwords = sp.getString(BuildVars.SHARED_PREFERENCES_FILTER_LIST_KEY,"");
-        //Check if the filter list is empty
-        if(filterwords.equals("")){
-            return true;
-        }
-        List<String> stringList = Arrays.asList(filterwords.split("\\s*,\\s*"));
-        for(String s : stringList ){
-            if(message.toLowerCase().contains(s.toLowerCase())){
-                Log.i("MediaMaid","Found filter word in tweet -> " + s);
-                isAppropriate = false;
-            }
-        }
-        return isAppropriate;
-    }
+
     public Status getTweetByID(long id){
         try {
             return twatter.tweets().showStatus(id);

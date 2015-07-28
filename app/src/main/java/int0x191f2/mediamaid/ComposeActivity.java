@@ -38,9 +38,6 @@ public class ComposeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
         if (id == R.id.sendMessage) {
             Boolean didSend = twitterTweeter.send(((EditText)(findViewById(R.id.composeMessageInput))).getText().toString());
             if(!(((EditText)(findViewById(R.id.composeMessageInput))).getText().toString().isEmpty())) {

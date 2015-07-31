@@ -6,6 +6,7 @@
         <item name="colorPrimaryDark">@color/primary_red_dark</item>
         <!--<item name="android:homeAsUpIndicator">@drawable/ic_nav_back_white</item>-->
         <!-- Prevents the activity from making its own action bar-->
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="windowActionBar">false</item>
     </style>
     <style name="Widget.CardContent" parent="android:Widget">

@@ -1,5 +1,6 @@
 package int0x191f2.mediamaid;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -42,6 +44,8 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                 coverImageLayout = (RelativeLayout) itemView.findViewById(R.id.navigationDrawerRelativeLayout);
             }
         }
+
+
     }
 
     DrawerAdapter(String titles[],int icons[], String name, String username, Bitmap profile, Bitmap cover){
@@ -72,7 +76,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
             holder.iconImageView.setImageResource(mNavIcons[position-1]);
         }else{
             holder.nameTextView.setText(name);
-            holder.userNameTextView.setText(username);
+            holder.userNameTextView.setText("@"+username);
             holder.profileImageView.setImageBitmap(profileImage);
 
             BitmapDrawable background = new BitmapDrawable(coverImage);

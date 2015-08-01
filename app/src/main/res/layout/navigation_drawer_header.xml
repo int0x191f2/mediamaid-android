@@ -27,6 +27,7 @@
             android:id="@+id/navigationDrawerHeaderUserName"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="5dp"
+            android:textColor="#ffffff"
             android:textSize="14sp"
             android:textStyle="normal"
             android:layout_width="wrap_content"

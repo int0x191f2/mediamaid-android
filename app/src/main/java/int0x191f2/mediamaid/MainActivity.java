@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void composeDialog(View view) {
+        twitterPictureCacheHandler.cleanCache();
         startActivity(new Intent(this, ComposeActivity.class));
     }
 
@@ -188,7 +189,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             User user = twatter.showUser(twatter.getScreenName());
             String coverImageURL="";
-            if(hasCoverImage()){
+            if(!hasCoverImage()){
+                //TODO include this with the app itself
                 coverImageURL="http://3.bp.blogspot.com/-LTQN-dQK2pI/VCp__h7_jhI/AAAAAAAACvI/Gs6Kd4i6Bzw/w2560-h1600-p/material_wallpaper_set_two%2B%281%29.jpg";
             }else {
                 coverImageURL= user.getProfileBannerURL();
@@ -221,12 +223,11 @@ public class MainActivity extends AppCompatActivity {
         //Cover image handling
         try {
             User user = twatter.showUser(twatter.getScreenName());
-            user.getProfileBannerURL();
+            Log.i("MediaMaid",user.getProfileBannerURL());
             return true;
         }catch(TwitterException e){
             Log.i("MediaMaid","Error getting header image");
             return false;
-            //TODO include this with the app itself
         }
     }
     @Override

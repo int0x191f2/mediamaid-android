@@ -5,12 +5,19 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Adam on 7/13/2015.
@@ -77,11 +84,15 @@ public class TwitterPictureCacheHandler {
     private void writeToCache(String name, Bitmap bm){
         try {
             FileOutputStream fos = context.openFileOutput(name, Context.MODE_PRIVATE);
-            bm.compress(Bitmap.CompressFormat.PNG,100,fos);
-            Log.e("MediaMaid","Wrote Bitmap to cache as '" + name + "'");
+            FileOutputStream cacheList = context.openFileOutput("cacheList.txt", Context.MODE_APPEND);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(cacheList);
+            outputStreamWriter.write(name + "\n");
+            bm.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            Log.i("MediaMaid","Wrote Bitmap to cache as '" + name + "'");
             if(fos!=null){
                 fos.close();
             }
+            outputStreamWriter.close();
         }catch(IOException e){
             Log.e("MediaMaid",e.toString());
         }
@@ -99,5 +110,38 @@ public class TwitterPictureCacheHandler {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private List<String> getCacheFilesList(){
+        List<String> lines = new ArrayList<String>();
+        try{
+            InputStream inputStream = context.openFileInput("cacheList.txt");
+            if(inputStream!=null){
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String line="";
+                while((line=bufferedReader.readLine())!=null){
+                    lines.add(line);
+                }
+                inputStream.close();
+            }
+        }catch (FileNotFoundException e){
+            Log.e("MediaMaid","File not found: " + e.toString());
+        }catch (IOException e){
+            Log.e("MediaMaid","Can not read file" + e.toString());
+        }
+        return lines;
+    }
+
+    public void cleanCache(){
+        try{
+            List<String> cacheList = getCacheFilesList();
+            for(String s : cacheList) {
+                context.deleteFile(s);
+            }
+        }catch (Exception e){
+            Log.e("MediaMaid",e.toString());
+        }
+
     }
 }

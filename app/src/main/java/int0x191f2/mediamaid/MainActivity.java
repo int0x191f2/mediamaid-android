@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
@@ -49,12 +50,16 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     public String[] drawerItems = {"Login","Settings"};
+    public int[] drawerIcons = {R.drawable.ic_compose,R.drawable.ic_compose};
     private static SharedPreferences sp;
     private TwitterAuth twitterAuth;
     private TwitterPictureCacheHandler twitterPictureCacheHandler;
     private com.melnykov.fab.FloatingActionButton fab;
     private ListView drawerListView;
     private DrawerLayout mDrawer;
+    private RecyclerView mDrawerRecyclerView;
+    private RecyclerView.Adapter mDrawerRecyclerViewAdapter;
+    private RecyclerView.LayoutManager mDrawerLayoutManager;
     private ActionBarDrawerToggle mToggle;
     private TwitterTimelineHandler timelineHandler;
     private ConnectionDetector connectionDetector;
@@ -155,6 +160,13 @@ public class MainActivity extends AppCompatActivity {
         mToggle.setDrawerIndicatorEnabled(true);
         mDrawer.setDrawerListener(mToggle);
 
+        //Configure the drawer/temp twitter instance
+        mDrawerRecyclerView = (RecyclerView) findViewById(R.id.navDrawerRecyclerView);
+        mDrawerLayoutManager = new LinearLayoutManager(this);
+        mDrawerRecyclerView.setLayoutManager(mDrawerLayoutManager);
+        mDrawerRecyclerView.setHasFixedSize(true);
+        updateDrawer();
+
         BuildVars.TWITTER_ACCESS_TOKEN_KEY = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_KEY,"");
         BuildVars.TWITTER_ACCESS_TOKEN_SECRET = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY,"");
 
@@ -171,17 +183,51 @@ public class MainActivity extends AppCompatActivity {
         updateDrawer();
     }
     private void updateDrawer(){
+        MediaMaidConfigurationBuilder.resetInstance();
+        Twitter twatter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+        try {
+            User user = twatter.showUser(twatter.getScreenName());
+            String coverImageURL="";
+            if(hasCoverImage()){
+                coverImageURL="http://3.bp.blogspot.com/-LTQN-dQK2pI/VCp__h7_jhI/AAAAAAAACvI/Gs6Kd4i6Bzw/w2560-h1600-p/material_wallpaper_set_two%2B%281%29.jpg";
+            }else {
+                coverImageURL= user.getProfileBannerURL();
+            }
+            Log.i("MediaMaid", "Got the user!");
+            Log.i("MediaMaid","coverImageURL: " + coverImageURL);
+            mDrawerRecyclerViewAdapter = new DrawerAdapter(
+                    drawerItems,
+                    drawerIcons,
+                    user.getName(),
+                    user.getScreenName(),
+                    twitterPictureCacheHandler.getProfileImageByUser(user.getScreenName(), user.getOriginalProfileImageURL()),
+                    twitterPictureCacheHandler.getCoverImageByUser(user.getScreenName(), coverImageURL)
+            );
+            mDrawerRecyclerView.setAdapter(mDrawerRecyclerViewAdapter);
+        }catch(Exception e){
+            Log.e("MediaMaid",e.toString());
+        }
         //Check that the user is logged in and set the drawer label accordingly
         if(!sp.getBoolean("loggedIn",true)){
             drawerItems[0] = "Login";
         }else{
             drawerItems[0] = "Logout";
         }
+    }
 
-        //Drawer list and action handling
-        drawerListView = (ListView) findViewById(R.id.navDrawer);
-        drawerListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
-        drawerListView.setOnItemClickListener(new DrawerItemClickListener());
+    private Boolean hasCoverImage(){
+        MediaMaidConfigurationBuilder.resetInstance();
+        Twitter twatter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+        //Cover image handling
+        try {
+            User user = twatter.showUser(twatter.getScreenName());
+            user.getProfileBannerURL();
+            return true;
+        }catch(TwitterException e){
+            Log.i("MediaMaid","Error getting header image");
+            return false;
+            //TODO include this with the app itself
+        }
     }
     @Override
     protected void onPostCreate(Bundle savedInstanceState)

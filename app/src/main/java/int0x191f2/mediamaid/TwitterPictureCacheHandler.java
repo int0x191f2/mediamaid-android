@@ -40,6 +40,26 @@ public class TwitterPictureCacheHandler {
         }
     }
 
+    public Bitmap getCoverImageByUser(String name, String url){
+        String covername = "cover_"+name;
+        if(isInCache(covername)) {
+            try {
+                FileInputStream fis = context.openFileInput(covername);
+                Bitmap bm = BitmapFactory.decodeStream(fis);
+                Log.i("MediaMaid","Read Bitmap from cache as '" + covername + "'");
+                return bm;
+            } catch (IOException e) {
+                //will never occur because it checks the cache first however this is required
+                Log.e("MediaMaid", e.toString());
+                return null;
+            }
+        }else{
+            Bitmap bm = getImageFromURL(url);
+            writeToCache(covername, bm);
+            return bm;
+        }
+    }
+
     private boolean isInCache(String name){
         try{
             FileInputStream fis = context.openFileInput(name);

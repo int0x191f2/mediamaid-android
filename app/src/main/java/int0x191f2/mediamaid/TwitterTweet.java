@@ -36,7 +36,8 @@ public class TwitterTweet {
         twatter = tf.getInstance();
     }
     public Boolean send(String message){
-        if(MediaMaidFilteringHandler.getInstance().checkTweetLanguageIsAppropriate(message,
+        //Check that the outgoing tweet doesn't contain any words on the filter list
+        if(!MediaMaidFilteringHandler.getInstance().checkTweetLanguageIsAppropriate(message,
                 sp.getString(BuildVars.SHARED_PREFERENCES_FILTER_LIST_KEY,""))){
                     return false;
         }

@@ -21,12 +21,13 @@ public class MediaMaidFilteringHandler {
         Boolean isAppropriate = true;
         //Check if the filter list is empty
         if(filterList.equals("")){
+            Log.i("MediaMaid","The filter list is empty!");
             return true;
         }
         List<String> stringList = Arrays.asList(filterList.split("\\s*,\\s*"));
         for(String s : stringList ){
             if(tweet.toLowerCase().contains(s.toLowerCase())){
-                Log.i("MediaMaid", "Found filter word in tweet -> " + s);
+                Log.i("MediaMaid","'" + s + "' is not in the sudoers file. This incident will be reported");
                 isAppropriate = false;
             }
         }

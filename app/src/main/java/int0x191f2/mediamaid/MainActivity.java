@@ -18,8 +18,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
@@ -49,8 +51,8 @@ import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
-    public String[] drawerItems = {"Login","Settings"};
-    public int[] drawerIcons = {R.drawable.ic_compose,R.drawable.ic_compose};
+    public String[] drawerItems = {"Settings","Logout"};
+    public int[] drawerIcons = {R.drawable.ic_retweet,R.drawable.ic_retweet_true};
     private static SharedPreferences sp;
     private TwitterAuth twitterAuth;
     private TwitterPictureCacheHandler twitterPictureCacheHandler;
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mDrawerRecyclerView;
     private RecyclerView.Adapter mDrawerRecyclerViewAdapter;
     private RecyclerView.LayoutManager mDrawerLayoutManager;
+    private GestureDetector mDrawerGestureDetector;
     private ActionBarDrawerToggle mToggle;
     private TwitterTimelineHandler timelineHandler;
     private ConnectionDetector connectionDetector;
@@ -72,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void composeDialog(View view) {
-        twitterPictureCacheHandler.cleanCache();
         startActivity(new Intent(this, ComposeActivity.class));
     }
 
@@ -161,12 +163,34 @@ public class MainActivity extends AppCompatActivity {
         mToggle.setDrawerIndicatorEnabled(true);
         mDrawer.setDrawerListener(mToggle);
 
-        //Configure the drawer/temp twitter instance
+        //Configure the drawer
         mDrawerRecyclerView = (RecyclerView) findViewById(R.id.navDrawerRecyclerView);
         mDrawerLayoutManager = new LinearLayoutManager(this);
+        mDrawerGestureDetector = new GestureDetector(MainActivity.this,new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e){
+                return true;
+            }
+        });
+        mDrawerRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener(){
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent){
+                View child = recyclerView.findChildViewUnder(motionEvent.getX(),motionEvent.getY());
+                if(child!=null&&mDrawerGestureDetector.onTouchEvent(motionEvent)){
+                    navigationDrawerItem(recyclerView.getChildPosition(child));
+                    return true;
+                }
+                return false;
+            }
+            @Override
+            public void onTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent){
+
+            }
+        });
         mDrawerRecyclerView.setLayoutManager(mDrawerLayoutManager);
         mDrawerRecyclerView.setHasFixedSize(true);
         updateDrawer();
+
 
         BuildVars.TWITTER_ACCESS_TOKEN_KEY = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_KEY,"");
         BuildVars.TWITTER_ACCESS_TOKEN_SECRET = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY,"");
@@ -189,11 +213,15 @@ public class MainActivity extends AppCompatActivity {
         try {
             User user = twatter.showUser(twatter.getScreenName());
             String coverImageURL="";
-            if(!hasCoverImage()){
-                //TODO include this with the app itself
-                coverImageURL="http://3.bp.blogspot.com/-LTQN-dQK2pI/VCp__h7_jhI/AAAAAAAACvI/Gs6Kd4i6Bzw/w2560-h1600-p/material_wallpaper_set_two%2B%281%29.jpg";
-            }else {
-                coverImageURL= user.getProfileBannerURL();
+            if(!twitterPictureCacheHandler.isInCache(user.getScreenName())) {
+                if (!hasCoverImage()) {
+                    //TODO include this with the app itself
+                    coverImageURL = "http://3.bp.blogspot.com/-LTQN-dQK2pI/VCp__h7_jhI/AAAAAAAACvI/Gs6Kd4i6Bzw/w2560-h1600-p/material_wallpaper_set_two%2B%281%29.jpg";
+                } else {
+                    coverImageURL = user.getProfileBannerURL();
+                }
+            }else{
+                coverImageURL="a";
             }
             Log.i("MediaMaid", "Got the user!");
             Log.i("MediaMaid","coverImageURL: " + coverImageURL);
@@ -208,12 +236,6 @@ public class MainActivity extends AppCompatActivity {
             mDrawerRecyclerView.setAdapter(mDrawerRecyclerViewAdapter);
         }catch(Exception e){
             Log.e("MediaMaid",e.toString());
-        }
-        //Check that the user is logged in and set the drawer label accordingly
-        if(!sp.getBoolean("loggedIn",true)){
-            drawerItems[0] = "Login";
-        }else{
-            drawerItems[0] = "Logout";
         }
     }
 
@@ -247,23 +269,27 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id){
-            navigationDrawerItem(position);
-        }
-    }
-
     private void navigationDrawerItem(int position) {
-        //Login button
+        //Because the navigation drawer touch listener isn't zero indexed
+        position=position-1;
+
         if(position==0){
+            startActivity(new Intent(this,SettingsActivity.class));
+        }
+        if(position==1){
             if(connectionDetector.isConnectingToInternet()) {
                 //Check that the user is logged in
                 if (sp.getBoolean("loggedIn", true)) {
                     Log.e("MediaMaid", "Logging out");
                     logout();  //Keep the login/logout consistent
                     updateDrawer(); //Clear timeline on logout
-                    //getTimeline();
+                    //Clear the cache!
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            twitterPictureCacheHandler.cleanCache();
+                        }
+                    }).start();
                     Intent returnToLogin = new Intent(this,LoginActivity.class);
                     startActivity(returnToLogin);
                     finish();
@@ -277,9 +303,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"No internet connection detected", Toast.LENGTH_SHORT).show();
             }
         }
-        if(position==1){
-            startActivity(new Intent(this,SettingsActivity.class));
-        }
+
     }
 
     private void logout() {

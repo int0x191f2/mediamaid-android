@@ -67,7 +67,7 @@ public class TwitterPictureCacheHandler {
         }
     }
 
-    private boolean isInCache(String name){
+    public boolean isInCache(String name){
         try{
             FileInputStream fis = context.openFileInput(name);
             if(fis.available()!=0){

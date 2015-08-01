@@ -25,11 +25,12 @@ import java.util.List;
 public class SettingsActivity extends AppCompatActivity{
     ListView listView;
     List<String> itemList;
-
+    TwitterPictureCacheHandler twitterPictureCacheHandler;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        twitterPictureCacheHandler=new TwitterPictureCacheHandler(getApplicationContext());
         listView = (ListView) findViewById(R.id.settingsListView);
         Toolbar tb = (Toolbar) findViewById(R.id.settingsToolbar);
         tb.setTitleTextColor(0xFFFFFFFF);
@@ -43,6 +44,8 @@ public class SettingsActivity extends AppCompatActivity{
         //Add things to the listview
         itemList = new ArrayList<String>();
         itemList.add("Edit the filter list");
+        itemList.add("Clear the cache");
+
         ArrayAdapter<String> adp = new ArrayAdapter<String>(getBaseContext(),R.layout.settings_listview,itemList);
         listView.setAdapter(adp);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -59,6 +62,15 @@ public class SettingsActivity extends AppCompatActivity{
             filterListDialogFragment.setCancelable(true);
             filterListDialogFragment.setDialogTitle("Filter List");
             filterListDialogFragment.show(fragmentManager,"Filter List");
+        }
+        if(position==1){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    twitterPictureCacheHandler.cleanCache();
+                }
+            }).start();
+            Toast.makeText(getApplicationContext(),"Clearing the cache",Toast.LENGTH_SHORT).show();
         }
     }
 }

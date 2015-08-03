@@ -316,22 +316,29 @@ public class MainActivity extends AppCompatActivity {
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
             List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
 
+
             for (twitter4j.Status status : statuses) {
-                //Get the censored tweet payload
-                String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
-                        sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY,""));
-                TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
-                        status.getUser().getScreenName(),
-                        String.valueOf(status.getId()),
-                        //TODO make the date/time work
-                        "$(date)",
-                        status.isRetweet(),
-                        status.isRetweetedByMe(),
-                        censoredTweetPayload,
-                        twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
-                results.add(index, obj);
-                index++;
+                if (sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_HARD_MODE_KEY, false)
+                        && !MediaMaidFilteringHandler.getInstance().checkTweetLanguageIsAppropriate(status.getText(),
+                        sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY, ""))) {
+                    Log.i("MediaMaid","Found an inappropriate tweet and we are in hard mode! Not showing...");
+                }else{
+                    //Get the censored tweet payload
+                    String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
+                            sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY, ""));
+                    TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
+                            status.getUser().getScreenName(),
+                            String.valueOf(status.getId()),
+                            //TODO make the date/time work
+                            "$(date)",
+                            status.isRetweet(),
+                            status.isRetweetedByMe(),
+                            censoredTweetPayload,
+                            twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+                    results.add(index, obj);
+                    index++;
                 }
+            }
             return results;
         }
 
@@ -448,25 +455,35 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onStatus(twitter4j.Status status) {
-                    //Censor the tweet
-                    String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
-                            sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY,""));
+                    if (sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_HARD_MODE_KEY, false)
+                            && !MediaMaidFilteringHandler.getInstance().checkTweetLanguageIsAppropriate(status.getText(),
+                            sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY, ""))) {
+                        Log.i("MediaMaid","Found an inappropriate tweet and we are in hard mode! Not showing...");
+                    }else{
+                        //Censor the tweet
+                        String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
+                                sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY,""));
 
-                    //Create the data object to give to the adapter
-                    TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
-                            status.getUser().getScreenName(),
-                            String.valueOf(status.getId()),
-                            //TODO make the date/time work
-                            "$(date)",
-                            status.isRetweet(),
-                            status.isRetweetedByMe(),
-                            censoredTweetPayload,
-                            twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
-                    //Add new tweet to the timeline
-                    ((TwitterTimelineViewAdapter) mAdapter).addItem(obj,0);
+                        //Create the data object to give to the adapter
+                        TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
+                                status.getUser().getScreenName(),
+                                String.valueOf(status.getId()),
+                                //TODO make the date/time work
+                                "$(date)",
+                                status.isRetweet(),
+                                status.isRetweetedByMe(),
+                                censoredTweetPayload,
+                                twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+                        //Add new tweet to the timeline
+                        ((TwitterTimelineViewAdapter) mAdapter).addItem(obj, 0);
 
-                    //Scroll to the top of the timeline to display the tweet automagically
-                    mLayoutManager.smoothScrollToPosition(mRecyclerView,null,0);
+                        //Check if the scroll to top setting is on
+                        if(sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_SCROLL_TO_TOP_KEY,false)) {
+                            //Scroll to the top of the timeline to display the tweet automagically
+                            mLayoutManager.smoothScrollToPosition(mRecyclerView, null, 0);
+                        }
+
+                    }
 
                 }
 

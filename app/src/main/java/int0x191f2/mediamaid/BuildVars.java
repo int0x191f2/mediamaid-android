@@ -21,7 +21,8 @@ public class BuildVars {
     public final static String SHARED_PREFERENCES_PROFILE_HEADER_URL_KEY = "headerPicURL";
 
     public final static String SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY="pref_filterList";
-    public final static String SHARED_PREFERENCES_SETTINGS_HARD_MODE_KEY="pref_hardMode";
+    public final static String SHARED_PREFERENCES_SETTINGS_HARD_MODE_KEY="pref_hardFilterMode";
+    public final static String SHARED_PREFERENCES_SETTINGS_SCROLL_TO_TOP_KEY="pref_scrollToTop";
 
     public static String TWITTER_ACCESS_TOKEN_KEY = "";
     public static String TWITTER_ACCESS_TOKEN_SECRET = "";

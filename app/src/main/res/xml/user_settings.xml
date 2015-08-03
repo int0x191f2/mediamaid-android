@@ -2,6 +2,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+        android:title="General" >
+        <CheckBoxPreference
+            android:key="pref_scrollToTop"
+            android:summary="Scroll to top when new tweets arrive"
+            android:title="Scroll to top"
+            android:defaultValue="true" >
+        </CheckBoxPreference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="Filter Settings" >
         <EditTextPreference
             android:title="Filter List"

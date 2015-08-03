@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Filter Settings" >
+        <EditTextPreference
+            android:title="Filter List"
+            android:summary="Edit the filter list (cat,dog,pig)"
+            android:key="pref_filterList" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_hardFilterMode"
+            android:summary="Completely remove filter list matches"
+            android:title="Hard filter mode">
+        </CheckBoxPreference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

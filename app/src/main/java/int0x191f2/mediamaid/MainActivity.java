@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -33,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -53,7 +55,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     public String[] drawerItems = {"Settings", "Logout"};
     public int[] drawerIcons = {R.drawable.ic_settings, R.drawable.ic_logout};
-    private static SharedPreferences sp;
+    private static SharedPreferences sp,sp_settings;
     private TwitterAuth twitterAuth;
     private TwitterPictureCacheHandler twitterPictureCacheHandler;
     private com.melnykov.fab.FloatingActionButton fab;
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("MediaMaid");
 
         sp = getApplicationContext().getSharedPreferences("MediaMaid", 0);
+        sp_settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         //Start the login activity if the user isn't logged in
         if (!sp.getBoolean(BuildVars.SHARED_PREFERENCES_LOGGED_IN_KEY, false)) {
@@ -316,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
             for (twitter4j.Status status : statuses) {
                 //Get the censored tweet payload
                 String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
-                        sp.getString(BuildVars.SHARED_PREFERENCES_FILTER_LIST_KEY,""));
+                        sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY,""));
                 TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
                         status.getUser().getScreenName(),
                         String.valueOf(status.getId()),
@@ -447,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onStatus(twitter4j.Status status) {
                     //Censor the tweet
                     String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
-                            sp.getString(BuildVars.SHARED_PREFERENCES_FILTER_LIST_KEY,""));
+                            sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY,""));
 
                     //Create the data object to give to the adapter
                     TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),

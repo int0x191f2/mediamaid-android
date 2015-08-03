@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -32,10 +33,12 @@ import java.util.List;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 public class SettingsActivity extends PreferenceActivity{
     private AppCompatDelegate mDelegate;
     private Toolbar tb;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         getDelegate().installViewFactory();
@@ -55,7 +58,7 @@ public class SettingsActivity extends PreferenceActivity{
                 finish();
             }
         });
-        root.addView(tb,0);
+        root.addView(tb, 0);
         addPreferencesFromResource(R.xml.user_settings);
     }
 

@@ -28,7 +28,6 @@ public class TwitterProfileViewActivity extends ActionBarActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private CardView mCardView;
     private Twitter twitter;
 
     @Override

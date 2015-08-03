@@ -8,12 +8,12 @@ android {
         applicationId "int0x191f2.mediamaid"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 1
-        versionName "0.1"
+        versionCode 2
+        versionName "0.1.1"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

@@ -125,7 +125,9 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
                 Intent intent = new Intent(v.getContext(),TwitterProfileViewActivity.class);
                 intent.putExtra("id",dataset.get(position).getTweetID());
                 v.getContext().startActivity(intent);
-                Log.i("MediaMaid",dataset.get(position).getUserName());
+                Log.i("MediaMaid", dataset.get(position).getUserName());
+                Log.i("MediaMaid", dataset.get(position).getTweetID());
+                Log.i("MediaMaid",String.valueOf(position));
             }
         });
 

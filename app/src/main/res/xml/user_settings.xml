@@ -2,7 +2,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="General" >
+        android:title="Timeline" >
+        <CheckBoxPreference
+            android:key="pref_streaming"
+            android:summary="Load tweets automatically"
+            android:title="Timeline streaming"
+            android:defaultValue="false" >
+        </CheckBoxPreference>
         <CheckBoxPreference
             android:key="pref_scrollToTop"
             android:summary="Scroll to top when new tweets arrive"
@@ -12,7 +18,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Filter Settings" >
+        android:title="Filter" >
         <EditTextPreference
             android:title="Filter List"
             android:summary="Edit the filter list (cat,dog,pig)"
@@ -25,4 +31,11 @@
         </CheckBoxPreference>
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Update" >
+        <EditTextPreference
+            android:enabled="false"
+            android:title="Update settings"
+            android:summary="Refresh timeline to use new settings (temporary)" />
+    </PreferenceCategory>
 </PreferenceScreen>

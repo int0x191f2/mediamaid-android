@@ -355,166 +355,168 @@ public class MainActivity extends AppCompatActivity {
                                                                                        }
                                                                                    });
 
-            MediaMaidConfigurationBuilder.resetInstance();
-            TwitterStream twitterStream = new TwitterStreamFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
-            UserStreamListener userStreamListener = new UserStreamListener() {
-                @Override
-                public void onDeletionNotice(long directMessageId, long userId) {
+            //Enable streaming if it is enabled in the settings
+            if(sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_STREAMING_KEY,false)) {
+                MediaMaidConfigurationBuilder.resetInstance();
+                TwitterStream twitterStream = new TwitterStreamFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+                UserStreamListener userStreamListener = new UserStreamListener() {
+                    @Override
+                    public void onDeletionNotice(long directMessageId, long userId) {
 
-                }
+                    }
 
-                @Override
-                public void onFriendList(long[] friendIds) {
+                    @Override
+                    public void onFriendList(long[] friendIds) {
 
-                }
+                    }
 
-                @Override
-                public void onFavorite(User source, User target, twitter4j.Status favoritedStatus) {
+                    @Override
+                    public void onFavorite(User source, User target, twitter4j.Status favoritedStatus) {
 
-                }
+                    }
 
-                @Override
-                public void onUnfavorite(User source, User target, twitter4j.Status unfavoritedStatus) {
+                    @Override
+                    public void onUnfavorite(User source, User target, twitter4j.Status unfavoritedStatus) {
 
-                }
+                    }
 
-                @Override
-                public void onFollow(User source, User followedUser) {
+                    @Override
+                    public void onFollow(User source, User followedUser) {
 
-                }
+                    }
 
-                @Override
-                public void onUnfollow(User source, User unfollowedUser) {
+                    @Override
+                    public void onUnfollow(User source, User unfollowedUser) {
 
-                }
+                    }
 
-                @Override
-                public void onDirectMessage(DirectMessage directMessage) {
+                    @Override
+                    public void onDirectMessage(DirectMessage directMessage) {
 
-                }
+                    }
 
-                @Override
-                public void onUserListMemberAddition(User addedMember, User listOwner, UserList list) {
+                    @Override
+                    public void onUserListMemberAddition(User addedMember, User listOwner, UserList list) {
 
-                }
+                    }
 
-                @Override
-                public void onUserListMemberDeletion(User deletedMember, User listOwner, UserList list) {
+                    @Override
+                    public void onUserListMemberDeletion(User deletedMember, User listOwner, UserList list) {
 
-                }
+                    }
 
-                @Override
-                public void onUserListSubscription(User subscriber, User listOwner, UserList list) {
+                    @Override
+                    public void onUserListSubscription(User subscriber, User listOwner, UserList list) {
 
-                }
+                    }
 
-                @Override
-                public void onUserListUnsubscription(User subscriber, User listOwner, UserList list) {
+                    @Override
+                    public void onUserListUnsubscription(User subscriber, User listOwner, UserList list) {
 
-                }
+                    }
 
-                @Override
-                public void onUserListCreation(User listOwner, UserList list) {
+                    @Override
+                    public void onUserListCreation(User listOwner, UserList list) {
 
-                }
+                    }
 
-                @Override
-                public void onUserListUpdate(User listOwner, UserList list) {
+                    @Override
+                    public void onUserListUpdate(User listOwner, UserList list) {
 
-                }
+                    }
 
-                @Override
-                public void onUserListDeletion(User listOwner, UserList list) {
+                    @Override
+                    public void onUserListDeletion(User listOwner, UserList list) {
 
-                }
+                    }
 
-                @Override
-                public void onUserProfileUpdate(User updatedUser) {
+                    @Override
+                    public void onUserProfileUpdate(User updatedUser) {
 
-                }
+                    }
 
-                @Override
-                public void onUserSuspension(long suspendedUser) {
+                    @Override
+                    public void onUserSuspension(long suspendedUser) {
 
-                }
+                    }
 
-                @Override
-                public void onUserDeletion(long deletedUser) {
+                    @Override
+                    public void onUserDeletion(long deletedUser) {
 
-                }
+                    }
 
-                @Override
-                public void onBlock(User source, User blockedUser) {
+                    @Override
+                    public void onBlock(User source, User blockedUser) {
 
-                }
+                    }
 
-                @Override
-                public void onUnblock(User source, User unblockedUser) {
+                    @Override
+                    public void onUnblock(User source, User unblockedUser) {
 
-                }
+                    }
 
-                @Override
-                public void onStatus(twitter4j.Status status) {
-                    if (sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_HARD_MODE_KEY, false)
-                            && !MediaMaidFilteringHandler.getInstance().checkTweetLanguageIsAppropriate(status.getText(),
-                            sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY, ""))) {
-                        Log.i("MediaMaid","Found an inappropriate tweet and we are in hard mode! Not showing...");
-                    }else{
-                        //Censor the tweet
-                        String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
-                                sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY,""));
+                    @Override
+                    public void onStatus(twitter4j.Status status) {
+                        if (sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_HARD_MODE_KEY, false)
+                                && !MediaMaidFilteringHandler.getInstance().checkTweetLanguageIsAppropriate(status.getText(),
+                                sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY, ""))) {
+                            Log.i("MediaMaid", "Found an inappropriate tweet and we are in hard mode! Not showing...");
+                        } else {
+                            //Censor the tweet
+                            String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
+                                    sp_settings.getString(BuildVars.SHARED_PREFERENCES_SETTINGS_FILTER_LIST_KEY, ""));
 
-                        //Create the data object to give to the adapter
-                        TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
-                                status.getUser().getScreenName(),
-                                String.valueOf(status.getId()),
-                                //TODO make the date/time work
-                                "$(date)",
-                                status.isRetweet(),
-                                status.isRetweetedByMe(),
-                                censoredTweetPayload,
-                                twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
-                        //Add new tweet to the timeline
-                        ((TwitterTimelineViewAdapter) mAdapter).addItem(obj, 0);
+                            //Create the data object to give to the adapter
+                            TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
+                                    status.getUser().getScreenName(),
+                                    String.valueOf(status.getId()),
+                                    //TODO make the date/time work
+                                    "$(date)",
+                                    status.isRetweet(),
+                                    status.isRetweetedByMe(),
+                                    censoredTweetPayload,
+                                    twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+                            //Add new tweet to the timeline
+                            ((TwitterTimelineViewAdapter) mAdapter).addItem(obj, 0);
 
-                        //Check if the scroll to top setting is on
-                        if(sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_SCROLL_TO_TOP_KEY,false)) {
-                            //Scroll to the top of the timeline to display the tweet automagically
-                            mLayoutManager.smoothScrollToPosition(mRecyclerView, null, 0);
+                            //Check if the scroll to top setting is on
+                            if (sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_SCROLL_TO_TOP_KEY, false)) {
+                                //Scroll to the top of the timeline to display the tweet automagically
+                                mLayoutManager.smoothScrollToPosition(mRecyclerView, null, 0);
+                            }
+
                         }
 
                     }
 
-                }
+                    @Override
+                    public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
 
-                @Override
-                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+                    }
 
-                }
+                    @Override
+                    public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
 
-                @Override
-                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
+                    }
 
-                }
+                    @Override
+                    public void onScrubGeo(long userId, long upToStatusId) {
 
-                @Override
-                public void onScrubGeo(long userId, long upToStatusId) {
+                    }
 
-                }
+                    @Override
+                    public void onStallWarning(StallWarning warning) {
 
-                @Override
-                public void onStallWarning(StallWarning warning) {
+                    }
 
-                }
+                    @Override
+                    public void onException(Exception ex) {
 
-                @Override
-                public void onException(Exception ex) {
-
-                }
-            };
-            twitterStream.addListener(userStreamListener);
-            twitterStream.user();
-
+                    }
+                };
+                twitterStream.addListener(userStreamListener);
+                twitterStream.user();
+            }
             mSwipeRefreshLayout.setRefreshing(false);
             startTimelineInAnimation();
         }

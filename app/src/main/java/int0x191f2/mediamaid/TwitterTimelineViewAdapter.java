@@ -132,7 +132,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
 
     }
     public void addItem(TwitterTimelineDataObject dataObject, int index){
-        dataset.add(dataObject);
+        dataset.add(index, dataObject);
         notifyItemInserted(index);
     }
     public void removeItem(int index){

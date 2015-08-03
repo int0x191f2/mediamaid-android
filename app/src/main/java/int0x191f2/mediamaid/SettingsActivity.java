@@ -43,6 +43,7 @@ public class SettingsActivity extends AppCompatActivity{
         //Add things to the listview
         itemList = new ArrayList<String>();
         itemList.add("Edit the filter list");
+        itemList.add("Clear the cache");
         ArrayAdapter<String> adp = new ArrayAdapter<String>(getBaseContext(),R.layout.settings_listview,itemList);
         listView.setAdapter(adp);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -59,6 +60,10 @@ public class SettingsActivity extends AppCompatActivity{
             filterListDialogFragment.setCancelable(true);
             filterListDialogFragment.setDialogTitle("Filter List");
             filterListDialogFragment.show(fragmentManager,"Filter List");
+        }
+        if(position==1){
+            new TwitterPictureCacheHandler(getApplicationContext()).cleanCache();
+            Toast.makeText(getApplication(),"Clearing the cache",Toast.LENGTH_SHORT).show();
         }
     }
 }

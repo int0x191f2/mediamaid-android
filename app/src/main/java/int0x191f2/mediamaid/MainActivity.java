@@ -18,8 +18,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
@@ -49,8 +51,8 @@ import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
-    public String[] drawerItems = {"Login","Settings"};
-    public int[] drawerIcons = {R.drawable.ic_compose,R.drawable.ic_compose};
+    public String[] drawerItems = {"Settings", "Logout"};
+    public int[] drawerIcons = {R.drawable.ic_settings, R.drawable.ic_logout};
     private static SharedPreferences sp;
     private TwitterAuth twitterAuth;
     private TwitterPictureCacheHandler twitterPictureCacheHandler;
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mDrawerRecyclerView;
     private RecyclerView.Adapter mDrawerRecyclerViewAdapter;
     private RecyclerView.LayoutManager mDrawerLayoutManager;
+    private GestureDetector mDrawerGestureDetector;
     private ActionBarDrawerToggle mToggle;
     private TwitterTimelineHandler timelineHandler;
     private ConnectionDetector connectionDetector;
@@ -76,9 +79,16 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, ComposeActivity.class));
     }
 
-    public void updateTimeline(){
+    public void updateTimeline() {
         startTimelineOutAnimation();
+
+        updateUserValues();
         new GetDataSet().execute(new ArrayList<TwitterTimelineDataObject>());
+    }
+
+    public void onCreateUnthreadedWork() {
+        updateUserValues();
+        updateDrawer();
     }
 
     @Override
@@ -90,11 +100,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-
         //Create the ConnectionDetector
         connectionDetector = new ConnectionDetector(getApplicationContext());
-        if(!connectionDetector.isConnectingToInternet()){
-            Toast.makeText(getApplicationContext(),"No internet connection detected", Toast.LENGTH_SHORT).show();
+        if (!connectionDetector.isConnectingToInternet()) {
+            Toast.makeText(getApplicationContext(), "No internet connection detected", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, LoginActivity.class));
         }
 
@@ -107,22 +116,22 @@ public class MainActivity extends AppCompatActivity {
         //Set the toolbar title and color
         Toolbar tb = (Toolbar) findViewById(R.id.mainToolbar);
         tb.setTitleTextColor(0xFFFFFFFF);
-        if(tb!=null){
+        if (tb != null) {
             setSupportActionBar(tb);
         }
         getSupportActionBar().setTitle("MediaMaid");
 
-        sp = getApplicationContext().getSharedPreferences("MediaMaid",0);
+        sp = getApplicationContext().getSharedPreferences("MediaMaid", 0);
 
         //Start the login activity if the user isn't logged in
-        if(!sp.getBoolean(BuildVars.SHARED_PREFERENCES_LOGGED_IN_KEY,false)){
+        if (!sp.getBoolean(BuildVars.SHARED_PREFERENCES_LOGGED_IN_KEY, false)) {
             Log.i("MediaMaid", "We weren't logged in OR we just logged in");
             Uri uri = getIntent().getData();
             //this means we just came from the login intent
-            if (uri != null && uri.toString().startsWith(BuildVars.TWITTER_OAUTH_CALLBACK) && uri.getQueryParameter(BuildVars.TWITTER_OAUTH_DENIED)==null) {
+            if (uri != null && uri.toString().startsWith(BuildVars.TWITTER_OAUTH_CALLBACK) && uri.getQueryParameter(BuildVars.TWITTER_OAUTH_DENIED) == null) {
                 Log.i("MediaMaid", "We are attempting to log in with the OAuth");
                 String verifier = uri.getQueryParameter(BuildVars.TWITTER_OAUTH_VERIFIER);
-                Log.i("MediaMaid", "verifier: "+verifier);
+                Log.i("MediaMaid", "verifier: " + verifier);
                 AccessToken token = twitterAuth.generateOAuthAccessToken(verifier);
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_KEY, token.getToken());
@@ -157,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         //Disable back button in top level of application
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         mDrawer = (DrawerLayout) findViewById(R.id.drawerLayout);
-        mToggle = new ActionBarDrawerToggle(this,mDrawer,tb,R.string.drawer_open, R.string.drawer_close);
+        mToggle = new ActionBarDrawerToggle(this, mDrawer, tb, R.string.drawer_open, R.string.drawer_close);
         mToggle.setDrawerIndicatorEnabled(true);
         mDrawer.setDrawerListener(mToggle);
 
@@ -166,70 +175,79 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayoutManager = new LinearLayoutManager(this);
         mDrawerRecyclerView.setLayoutManager(mDrawerLayoutManager);
         mDrawerRecyclerView.setHasFixedSize(true);
-        updateDrawer();
+        mDrawerGestureDetector = new GestureDetector(MainActivity.this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+        });
+        mDrawerRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                View child = mDrawerRecyclerView.findChildViewUnder(e.getX(), e.getY());
+                if (child != null && mDrawerGestureDetector.onTouchEvent(e)) {
+                    mDrawer.closeDrawers();
+                    navigationDrawerItem(mDrawerRecyclerView.getChildPosition(child));
+                    return true;
+                }
+                return false;
+            }
 
-        BuildVars.TWITTER_ACCESS_TOKEN_KEY = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_KEY,"");
-        BuildVars.TWITTER_ACCESS_TOKEN_SECRET = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY,"");
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
 
-        //Get the timeline if the user is logged in
+            }
+        });
+
+        BuildVars.TWITTER_ACCESS_TOKEN_KEY = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_KEY, "");
+        BuildVars.TWITTER_ACCESS_TOKEN_SECRET = sp.getString(BuildVars.SHARED_PREFERENCES_ACCESS_TOKEN_SECRET_KEY, "");
         if(sp.getBoolean("loggedIn",false)){
+            onCreateUnthreadedWork();
             updateTimeline();
         }
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
-        //Set up the inital drawer
-        updateDrawer();
     }
-    private void updateDrawer(){
-        MediaMaidConfigurationBuilder.resetInstance();
-        Twitter twatter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+
+    private void updateUserValues() {
         try {
+            MediaMaidConfigurationBuilder.resetInstance();
+            final Twitter twatter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
             User user = twatter.showUser(twatter.getScreenName());
-            String coverImageURL="";
-            if(!hasCoverImage()){
+            sp.edit().putString(BuildVars.SHARED_PREFERENCES_NAME_KEY, user.getName()).apply();
+            sp.edit().putString(BuildVars.SHARED_PREFERENCES_USERNAME_KEY, user.getScreenName()).apply();
+            sp.edit().putString(BuildVars.SHARED_PREFERENCES_PROFILE_IMAGE_URL_KEY, user.getOriginalProfileImageURL()).apply();
+            //sp.edit().putString(BuildVars.SHARED_PREFERENCES_PROFILE_HEADER_URL_KEY, user.getProfileBannerURL()).apply();
+            if (user.getProfileBannerURL().equals("")) {
                 //TODO include this with the app itself
-                coverImageURL="http://3.bp.blogspot.com/-LTQN-dQK2pI/VCp__h7_jhI/AAAAAAAACvI/Gs6Kd4i6Bzw/w2560-h1600-p/material_wallpaper_set_two%2B%281%29.jpg";
-            }else {
-                coverImageURL= user.getProfileBannerURL();
+                sp.edit().putString(BuildVars.SHARED_PREFERENCES_PROFILE_HEADER_URL_KEY,"http://3.bp.blogspot.com/-LTQN-dQK2pI/VCp__h7_jhI/AAAAAAAACvI/Gs6Kd4i6Bzw/w2560-h1600-p/material_wallpaper_set_two%2B%281%29.jpg").apply();
+            } else {
+                sp.edit().putString(BuildVars.SHARED_PREFERENCES_PROFILE_HEADER_URL_KEY,user.getProfileBannerURL()).apply();
             }
-            Log.i("MediaMaid", "Got the user!");
-            Log.i("MediaMaid","coverImageURL: " + coverImageURL);
-            mDrawerRecyclerViewAdapter = new DrawerAdapter(
-                    drawerItems,
-                    drawerIcons,
-                    user.getName(),
-                    user.getScreenName(),
-                    twitterPictureCacheHandler.getProfileImageByUser(user.getScreenName(), user.getOriginalProfileImageURL()),
-                    twitterPictureCacheHandler.getCoverImageByUser(user.getScreenName(), coverImageURL)
-            );
-            mDrawerRecyclerView.setAdapter(mDrawerRecyclerViewAdapter);
-        }catch(Exception e){
-            Log.e("MediaMaid",e.toString());
-        }
-        //Check that the user is logged in and set the drawer label accordingly
-        if(!sp.getBoolean("loggedIn",true)){
-            drawerItems[0] = "Login";
-        }else{
-            drawerItems[0] = "Logout";
+        } catch (Exception e) {
+            Log.e("MediaMaid", "Error updating the user values: \n" + e.toString());
         }
     }
 
-    private Boolean hasCoverImage(){
-        MediaMaidConfigurationBuilder.resetInstance();
-        Twitter twatter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
-        //Cover image handling
+    private void updateDrawer() {
         try {
-            User user = twatter.showUser(twatter.getScreenName());
-            Log.i("MediaMaid",user.getProfileBannerURL());
-            return true;
-        }catch(TwitterException e){
-            Log.i("MediaMaid","Error getting header image");
-            return false;
+            mDrawerRecyclerViewAdapter = new DrawerAdapter(
+                    drawerItems,
+                    drawerIcons,
+                    sp.getString(BuildVars.SHARED_PREFERENCES_NAME_KEY, ""),
+                    sp.getString(BuildVars.SHARED_PREFERENCES_USERNAME_KEY, ""),
+                    twitterPictureCacheHandler.getProfileImageByUser(sp.getString(BuildVars.SHARED_PREFERENCES_USERNAME_KEY, ""), sp.getString(BuildVars.SHARED_PREFERENCES_PROFILE_IMAGE_URL_KEY, "")),
+                    twitterPictureCacheHandler.getCoverImageByUser(sp.getString(BuildVars.SHARED_PREFERENCES_USERNAME_KEY, ""), sp.getString(BuildVars.SHARED_PREFERENCES_PROFILE_HEADER_URL_KEY,""))
+            );
+            mDrawerRecyclerView.setAdapter(mDrawerRecyclerViewAdapter);
+        } catch (Exception e) {
+            Log.e("MediaMaid", "Error setting up the drawer: \n" + e.toString());
         }
     }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
@@ -247,16 +265,13 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id){
-            navigationDrawerItem(position);
-        }
-    }
-
+    //Handle the clicks on the navigation drawer
     private void navigationDrawerItem(int position) {
-        //Login button
+        position=position-1;
         if(position==0){
+            startActivity(new Intent(this,SettingsActivity.class));
+        }
+        if(position==1){
             if(connectionDetector.isConnectingToInternet()) {
                 //Check that the user is logged in
                 if (sp.getBoolean("loggedIn", true)) {
@@ -277,9 +292,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"No internet connection detected", Toast.LENGTH_SHORT).show();
             }
         }
-        if(position==1){
-            startActivity(new Intent(this,SettingsActivity.class));
-        }
+
     }
 
     private void logout() {
@@ -332,39 +345,156 @@ public class MainActivity extends AppCompatActivity {
                                                                                        }
                                                                                    });
 
-//            StatusListener listener = new StatusListener() {
-//                @Override
-//                public void onStatus(twitter4j.Status status) {
-//                    TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
-//                            status.getUser().getScreenName(),
-//                            String.valueOf(status.getId()),
-//                            //TODO make the date/time work
-//                            "$(date)",
-//                            status.isRetweet(),
-//                            status.isRetweetedByMe(),
-//                            status.getText(),
-//                            twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
-//                    ((TwitterTimelineViewAdapter) mAdapter).addItem(obj,mAdapter.getItemCount()+1);
-//                }
-//
-//                @Override
-//                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {}
-//                @Override
-//                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {}
-//                @Override
-//                public void onScrubGeo(long userId, long upToStatusId) {}
-//                @Override
-//                public void onStallWarning(StallWarning warning) {}
-//                @Override
-//                public void onException(Exception ex) {
-//                    Log.e("MediaMaid",ex.toString());
-//                }
-//            };
-//            TwitterStreamFactory twitterStreamFactory;
-//            twitterStreamFactory = new TwitterStreamFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build());
-//            TwitterStream twitterStream = twitterStreamFactory.getInstance();
-//            twitterStream.addListener(listener);
-//            twitterStream.sample();
+            MediaMaidConfigurationBuilder.resetInstance();
+            TwitterStream twitterStream = new TwitterStreamFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+            UserStreamListener userStreamListener = new UserStreamListener() {
+                @Override
+                public void onDeletionNotice(long directMessageId, long userId) {
+
+                }
+
+                @Override
+                public void onFriendList(long[] friendIds) {
+
+                }
+
+                @Override
+                public void onFavorite(User source, User target, twitter4j.Status favoritedStatus) {
+
+                }
+
+                @Override
+                public void onUnfavorite(User source, User target, twitter4j.Status unfavoritedStatus) {
+
+                }
+
+                @Override
+                public void onFollow(User source, User followedUser) {
+
+                }
+
+                @Override
+                public void onUnfollow(User source, User unfollowedUser) {
+
+                }
+
+                @Override
+                public void onDirectMessage(DirectMessage directMessage) {
+
+                }
+
+                @Override
+                public void onUserListMemberAddition(User addedMember, User listOwner, UserList list) {
+
+                }
+
+                @Override
+                public void onUserListMemberDeletion(User deletedMember, User listOwner, UserList list) {
+
+                }
+
+                @Override
+                public void onUserListSubscription(User subscriber, User listOwner, UserList list) {
+
+                }
+
+                @Override
+                public void onUserListUnsubscription(User subscriber, User listOwner, UserList list) {
+
+                }
+
+                @Override
+                public void onUserListCreation(User listOwner, UserList list) {
+
+                }
+
+                @Override
+                public void onUserListUpdate(User listOwner, UserList list) {
+
+                }
+
+                @Override
+                public void onUserListDeletion(User listOwner, UserList list) {
+
+                }
+
+                @Override
+                public void onUserProfileUpdate(User updatedUser) {
+
+                }
+
+                @Override
+                public void onUserSuspension(long suspendedUser) {
+
+                }
+
+                @Override
+                public void onUserDeletion(long deletedUser) {
+
+                }
+
+                @Override
+                public void onBlock(User source, User blockedUser) {
+
+                }
+
+                @Override
+                public void onUnblock(User source, User unblockedUser) {
+
+                }
+
+                @Override
+                public void onStatus(twitter4j.Status status) {
+                    //Censor the tweet
+                    String censoredTweetPayload = MediaMaidFilteringHandler.getInstance().getCensoredTweet(status.getText(),
+                            sp.getString(BuildVars.SHARED_PREFERENCES_FILTER_LIST_KEY,""));
+
+                    //Create the data object to give to the adapter
+                    TwitterTimelineDataObject obj = new TwitterTimelineDataObject(status.getUser().getName(),
+                            status.getUser().getScreenName(),
+                            String.valueOf(status.getId()),
+                            //TODO make the date/time work
+                            "$(date)",
+                            status.isRetweet(),
+                            status.isRetweetedByMe(),
+                            censoredTweetPayload,
+                            twitterPictureCacheHandler.getProfileImageByUser(status.getUser().getScreenName(), status.getUser().getOriginalProfileImageURL()));
+                    //Add new tweet to the timeline
+                    ((TwitterTimelineViewAdapter) mAdapter).addItem(obj,0);
+
+                    //Scroll to the top of the timeline to display the tweet automagically
+                    mLayoutManager.smoothScrollToPosition(mRecyclerView,null,0);
+
+                }
+
+                @Override
+                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+
+                }
+
+                @Override
+                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
+
+                }
+
+                @Override
+                public void onScrubGeo(long userId, long upToStatusId) {
+
+                }
+
+                @Override
+                public void onStallWarning(StallWarning warning) {
+
+                }
+
+                @Override
+                public void onException(Exception ex) {
+
+                }
+            };
+            twitterStream.addListener(userStreamListener);
+            twitterStream.user();
+
             mSwipeRefreshLayout.setRefreshing(false);
             startTimelineInAnimation();
         }
@@ -380,14 +510,5 @@ public class MainActivity extends AppCompatActivity {
         TranslateAnimation anim = new TranslateAnimation(0,2*mRecyclerView.getWidth(),0,0);
         anim.setDuration(1000);
         //mRecyclerView.startAnimation(anim);
-    }
-
-    public boolean checkAuthentication(){
-        try{
-            timelineHandler.getTimeline(1);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
     }
 }

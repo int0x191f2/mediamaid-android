@@ -29,7 +29,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
         int holderid;
         TextView itemTextView, nameTextView, userNameTextView;
         ImageView iconImageView, profileImageView;
-        RelativeLayout coverImageLayout;
+        ImageView coverImageView;
 
         public ViewHolder(View itemView, int ViewType){
             super(itemView);
@@ -41,7 +41,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
                 nameTextView = (TextView) itemView.findViewById(R.id.navigationDrawerHeaderName);
                 userNameTextView = (TextView) itemView.findViewById(R.id.navigationDrawerHeaderUserName);
                 profileImageView = (ImageView) itemView.findViewById(R.id.navigationDrawerProfileImage);
-                coverImageLayout = (RelativeLayout) itemView.findViewById(R.id.navigationDrawerRelativeLayout);
+                coverImageView = (ImageView) itemView.findViewById(R.id.navigationDrawerHeaderImage);
             }
         }
 
@@ -78,9 +78,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
             holder.nameTextView.setText(name);
             holder.userNameTextView.setText("@"+username);
             holder.profileImageView.setImageBitmap(profileImage);
-
-            BitmapDrawable background = new BitmapDrawable(coverImage);
-            holder.coverImageLayout.setBackgroundDrawable(background);
+            holder.coverImageView.setImageBitmap(coverImage);
         }
     }
 

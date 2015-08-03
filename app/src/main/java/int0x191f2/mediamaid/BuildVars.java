@@ -15,6 +15,10 @@ public class BuildVars {
     public final static String SHARED_PREFERENCES_LOGGED_IN_KEY = "loggedIn";
     public final static String SHARED_PREFERENCES_FILTER_LIST_KEY = "filterList";
     public final static String SHARED_PREFERENCES_SOFT_FILTER_MODE_KEY = "softFilterMode";
+    public final static String SHARED_PREFERENCES_NAME_KEY ="name";
+    public final static String SHARED_PREFERENCES_USERNAME_KEY = "username";
+    public final static String SHARED_PREFERENCES_PROFILE_IMAGE_URL_KEY = "profilePicURL";
+    public final static String SHARED_PREFERENCES_PROFILE_HEADER_URL_KEY = "headerPicURL";
 
     public static String TWITTER_ACCESS_TOKEN_KEY = "";
     public static String TWITTER_ACCESS_TOKEN_SECRET = "";

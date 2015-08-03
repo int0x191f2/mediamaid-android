@@ -18,6 +18,7 @@ public class MediaMaidConfigurationBuilder {
     public MediaMaidConfigurationBuilder(){
         try{
             configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.setDebugEnabled(true);
             configurationBuilder.setOAuthConsumerKey(BuildVars.TWITTER_CONSUMER_KEY);
             configurationBuilder.setOAuthConsumerSecret(BuildVars.TWITTER_CONSUMER_SECRET);
             configurationBuilder.setOAuthAccessToken(BuildVars.TWITTER_ACCESS_TOKEN_KEY);

@@ -1,6 +1,7 @@
 package int0x191f2.mediamaid;
 
 import android.content.Intent;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import twitter4j.Status;
@@ -33,6 +35,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         TextView tweetID;
         TextView tweetDate;
         ImageView retweetIndicator;
+        ImageView deleteButton;
         TextView tweetPayload;
         ImageButton actionRetweet;
         public DataObjectHolder(View itemView){
@@ -44,6 +47,7 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
             tweetID = (TextView) itemView.findViewById(R.id.cardViewTweetID);
             tweetDate = (TextView) itemView.findViewById(R.id.cardViewTweetDate);
             retweetIndicator = (ImageView) itemView.findViewById(R.id.cardViewRetweetIndicator);
+            deleteButton = (ImageView) itemView.findViewById(R.id.cardViewActionDelete);
             tweetPayload = (TextView) itemView.findViewById(R.id.cardViewTweetPayload);
             actionRetweet = (ImageButton) itemView.findViewById(R.id.cardViewActionRetweet);
             itemView.setOnClickListener(this);
@@ -77,7 +81,9 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         tf = new TwitterFactory(cb.build());
         twatter = tf.getInstance();
         final Long id = Long.valueOf(dataset.get(position).getTweetID()).longValue();
-        
+
+        Log.i("MediaMaid","Loading item with index: "+position);
+
         if(dataset.get(position).getIsRetweetByMe()) {
             holder.actionRetweet.setImageResource(R.drawable.ic_retweet_true);
         }
@@ -95,6 +101,24 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
             holder.retweetIndicator.setVisibility(View.GONE);
         }
 
+        //Check if this is our tweet
+        if(dataset.get(position).getUserName().equals(BuildVars.TWITTER_USERNAME)){
+            holder.deleteButton.setVisibility(View.VISIBLE);
+        }else{
+            holder.deleteButton.setVisibility(View.GONE);
+        }
+        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Long id=Long.valueOf(dataset.get(position).getTweetID()).longValue();
+                try {
+                    twatter.destroyStatus(id);
+                    removeItem(position);
+                }catch(Exception e){
+                    Log.e("MediaMaid","Error destroying status: "+e.toString());
+                }
+            }
+        });
         //Favorite button click listener
         holder.actionRetweet.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -140,6 +164,14 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
     public void removeItem(int index){
         dataset.remove(index);
         notifyItemRemoved(index);
+    }
+    public List<String> getItems(){
+        List<String> items=new ArrayList<String>();
+        for(int i=getItemCount();i>0;i--){
+            items.add(i,i + dataset.get(i).getTweetPayload());
+            Log.i("MediaMaid",i+"");
+        }
+        return items;
     }
     public TwitterTimelineViewAdapter(ArrayList<TwitterTimelineDataObject> dataset){
         this.dataset = dataset;

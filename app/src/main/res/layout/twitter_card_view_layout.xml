@@ -84,6 +84,13 @@
                 android:layout_height="52dp"
                 android:id="@+id/cardViewActionRetweet"
                 android:src="@drawable/ic_retweet"/>
+            <ImageButton
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:id="@+id/cardViewActionDelete"
+                android:src="@drawable/ic_delete" />
             <LinearLayout
                 android:orientation="horizontal"
                 android:gravity="center|end"

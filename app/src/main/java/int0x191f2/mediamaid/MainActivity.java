@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void composeDialog(View view) {
-        twitterPictureCacheHandler.cleanCache();
         startActivity(new Intent(this, ComposeActivity.class));
     }
 
@@ -218,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
             MediaMaidConfigurationBuilder.resetInstance();
             final Twitter twatter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
             User user = twatter.showUser(twatter.getScreenName());
+            BuildVars.TWITTER_USERNAME=user.getScreenName();
             sp.edit().putString(BuildVars.SHARED_PREFERENCES_NAME_KEY, user.getName()).apply();
             sp.edit().putString(BuildVars.SHARED_PREFERENCES_USERNAME_KEY, user.getScreenName()).apply();
             sp.edit().putString(BuildVars.SHARED_PREFERENCES_PROFILE_IMAGE_URL_KEY, user.getOriginalProfileImageURL()).apply();
@@ -481,6 +481,7 @@ public class MainActivity extends AppCompatActivity {
                             if (sp_settings.getBoolean(BuildVars.SHARED_PREFERENCES_SETTINGS_SCROLL_TO_TOP_KEY, false)) {
                                 //Scroll to the top of the timeline to display the tweet automagically
                                 mLayoutManager.smoothScrollToPosition(mRecyclerView, null, 0);
+                                Log.i("MediaMaid","Scrolling to top!");
                             }
 
                         }

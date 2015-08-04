@@ -26,4 +26,5 @@ public class BuildVars {
 
     public static String TWITTER_ACCESS_TOKEN_KEY = "";
     public static String TWITTER_ACCESS_TOKEN_SECRET = "";
+    public static String TWITTER_USERNAME="";
 }

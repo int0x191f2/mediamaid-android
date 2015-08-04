@@ -83,8 +83,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateTimeline() {
         startTimelineOutAnimation();
-
-        updateUserValues();
         new GetDataSet().execute(new ArrayList<TwitterTimelineDataObject>());
     }
 

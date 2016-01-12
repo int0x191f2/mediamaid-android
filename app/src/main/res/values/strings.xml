@@ -19,4 +19,8 @@
     <string name="tweet_view_transition">tweet_view_transition</string>
     <string name="title_activity_twitter_tweet_view">TwitterTweetViewActivity</string>
     <string name="title_activity_twitter_profile_view">TwitterProfileViewActivity</string>
+    <string name="title_activity_twitter_find_user">TwitterFindUser</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

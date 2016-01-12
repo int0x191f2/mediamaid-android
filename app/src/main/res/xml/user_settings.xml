@@ -7,7 +7,7 @@
             android:key="pref_streaming"
             android:summary="Load tweets automatically"
             android:title="Timeline streaming"
-            android:defaultValue="false" >
+            android:defaultValue="true" >
         </CheckBoxPreference>
         <CheckBoxPreference
             android:key="pref_scrollToTop"
@@ -32,10 +32,14 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Update" >
+        android:title="Info" >
         <EditTextPreference
             android:enabled="false"
             android:title="Update settings"
             android:summary="Refresh timeline to use new settings (temporary)" />
+        <EditTextPreference
+            android:enabled="false"
+            android:title="Version"
+            android:summary="0.1.4" />
     </PreferenceCategory>
 </PreferenceScreen>

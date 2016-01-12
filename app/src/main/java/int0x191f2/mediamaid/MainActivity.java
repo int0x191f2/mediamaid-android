@@ -2,6 +2,7 @@ package int0x191f2.mediamaid;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -43,8 +44,6 @@ import java.util.List;
 import java.util.ArrayList;
 import android.util.Log;
 
-import org.apache.http.StatusLine;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
@@ -53,8 +52,8 @@ import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
-    public String[] drawerItems = {"Settings", "Logout"};
-    public int[] drawerIcons = {R.drawable.ic_settings, R.drawable.ic_logout};
+    public String[] drawerItems = {"Search","Settings", "Logout"};
+    public int[] drawerIcons = {R.drawable.ic_settings,R.drawable.ic_settings, R.drawable.ic_logout};
     private static SharedPreferences sp,sp_settings;
     private TwitterAuth twitterAuth;
     private TwitterPictureCacheHandler twitterPictureCacheHandler;
@@ -270,9 +269,16 @@ public class MainActivity extends AppCompatActivity {
     private void navigationDrawerItem(int position) {
         position=position-1;
         if(position==0){
-            startActivity(new Intent(this,SettingsActivity.class));
+            FragmentManager fragmentManager = getFragmentManager();
+            SearchUserDialogFragment searchUserDialogFragment= new SearchUserDialogFragment();
+            searchUserDialogFragment.setCancelable(true);
+            searchUserDialogFragment.setDialogTitle("Search User");
+            searchUserDialogFragment.show(fragmentManager, "Search User");
         }
         if(position==1){
+            startActivity(new Intent(this,SettingsActivity.class));
+        }
+        if(position==2){
             if(connectionDetector.isConnectingToInternet()) {
                 //Check that the user is logged in
                 if (sp.getBoolean("loggedIn", true)) {
@@ -312,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         protected ArrayList<TwitterTimelineDataObject> doInBackground(ArrayList<TwitterTimelineDataObject>... params) {
             int index=0;
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
-            List<twitter4j.Status> statuses = timelineHandler.getTimeline(40);
+            List<twitter4j.Status> statuses = timelineHandler.getTimeline(200);
 
 
             for (twitter4j.Status status : statuses) {

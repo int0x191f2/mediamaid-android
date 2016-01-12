@@ -52,8 +52,8 @@ import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
-    public String[] drawerItems = {"Search","Settings", "Logout"};
-    public int[] drawerIcons = {R.drawable.ic_settings,R.drawable.ic_settings, R.drawable.ic_logout};
+    public String[] drawerItems = {"Go to user","Settings", "Logout"};
+    public int[] drawerIcons = {R.drawable.ic_searchuser,R.drawable.ic_settings, R.drawable.ic_logout};
     private static SharedPreferences sp,sp_settings;
     private TwitterAuth twitterAuth;
     private TwitterPictureCacheHandler twitterPictureCacheHandler;
@@ -190,6 +190,11 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean b) {
+
             }
 
             @Override

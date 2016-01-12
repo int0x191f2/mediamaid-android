@@ -14,11 +14,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.util.Log;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import android.view.Window;
+import android.view.Gravity;
 
 public class SearchUserDialogFragment extends DialogFragment {
     EditText input;
     Button submitButton;
     String title;
+    Twitter twitter;
     public interface SearchUserDialogListener{
         void onFinishInputDialog(String list);
     }
@@ -37,10 +43,23 @@ public class SearchUserDialogFragment extends DialogFragment {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(),TwitterProfileViewActivity.class);
-                intent.putExtra("id",input.getText());
-                v.getContext().startActivity(intent);
-                dismiss();
+                try {
+                    Log.i("MediaMaid", "Going to user " + input.getText());
+                    Intent intent = new Intent(v.getContext(), TwitterProfileViewActivity.class);
+                    intent.putExtra("userhandle", input.getText().toString());
+
+                    //Get real name from handle
+                    MediaMaidConfigurationBuilder.resetInstance();
+                    twitter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+
+                    intent.putExtra("username", twitter.showUser(input.getText().toString()).getName());
+                    v.getContext().startActivity(intent);
+                    dismiss();
+                }catch(Exception e){
+                    Toast.makeText(v.getContext(),"Invalid username",Toast.LENGTH_SHORT).show();
+                    Log.e("MediaMaid", "Error searching for user");
+                    dismiss();
+                }
             }
         });
         input.requestFocus();
@@ -48,5 +67,13 @@ public class SearchUserDialogFragment extends DialogFragment {
         getDialog().setTitle(this.title);
 
         return view;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Window window = getDialog().getWindow();
+        window.setLayout(800, 350);
+        window.setGravity(Gravity.CENTER);
     }
 }

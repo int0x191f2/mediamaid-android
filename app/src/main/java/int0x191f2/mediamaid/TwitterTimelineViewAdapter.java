@@ -146,12 +146,22 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         holder.profileImage.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent intent = new Intent(v.getContext(),TwitterProfileViewActivity.class);
-                intent.putExtra("id",dataset.get(position).getTweetID());
-                v.getContext().startActivity(intent);
-                Log.i("MediaMaid", dataset.get(position).getUserName());
-                Log.i("MediaMaid", dataset.get(position).getTweetID());
-                Log.i("MediaMaid",String.valueOf(position));
+                try {
+                    MediaMaidConfigurationBuilder.resetInstance();
+                    Twitter twitter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+                    Intent intent = new Intent(v.getContext(), TwitterProfileViewActivity.class);
+                    Long id = Long.valueOf(dataset.get(position).getTweetID()).longValue();
+                    String userhandle = twitter.showStatus(id).getUser().getScreenName();
+                    String username = twitter.showStatus(id).getUser().getName();
+                    intent.putExtra("userhandle", userhandle);
+                    intent.putExtra("username", username);
+                    v.getContext().startActivity(intent);
+                    Log.i("MediaMaid", dataset.get(position).getUserName());
+                    Log.i("MediaMaid", dataset.get(position).getTweetID());
+                    Log.i("MediaMaid", String.valueOf(position));
+                }catch(Exception e){
+                    Log.e("MediaMaid","Error loading user profile");
+                }
             }
         });
 

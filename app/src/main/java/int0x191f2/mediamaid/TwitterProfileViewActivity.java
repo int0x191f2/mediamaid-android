@@ -38,15 +38,8 @@ public class TwitterProfileViewActivity extends ActionBarActivity {
         MediaMaidConfigurationBuilder.resetInstance();
         twitter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
 
-        String userID = getIntent().getStringExtra("id");
-        Long id = Long.valueOf(userID).longValue();
-        try {
-            Status st = twitter.showStatus(id);
-            userHandle = st.getUser().getScreenName();
-            userName = st.getUser().getName();
-        }catch(Exception e){
-            Log.e("MediaMaid","Exception when getting user handle:"+e.toString());
-        }
+        userHandle = getIntent().getStringExtra("userhandle");
+        userName = getIntent().getStringExtra("username");
 
         //Set the toolbar title and color
         Toolbar tb = (Toolbar) findViewById(R.id.profileViewToolbar);

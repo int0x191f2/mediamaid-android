@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         protected ArrayList<TwitterTimelineDataObject> doInBackground(ArrayList<TwitterTimelineDataObject>... params) {
             int index=0;
             ArrayList results = new ArrayList<TwitterTimelineDataObject>();
-            List<twitter4j.Status> statuses = timelineHandler.getTimeline(200);
+            List<twitter4j.Status> statuses = timelineHandler.getTimeline(50);
 
 
             for (twitter4j.Status status : statuses) {

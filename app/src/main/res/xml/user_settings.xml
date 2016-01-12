@@ -40,6 +40,6 @@
         <EditTextPreference
             android:enabled="false"
             android:title="Version"
-            android:summary="0.1.5" />
+            android:summary="0.1.6" />
     </PreferenceCategory>
 </PreferenceScreen>

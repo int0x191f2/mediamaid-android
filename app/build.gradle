@@ -8,8 +8,8 @@ android {
         applicationId "int0x191f2.mediamaid"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 6
-        versionName "0.1.5"
+        versionCode 7
+        versionName "0.1.6"
     }
     buildTypes {
         release {

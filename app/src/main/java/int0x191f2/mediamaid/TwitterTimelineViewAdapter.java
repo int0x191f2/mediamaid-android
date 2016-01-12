@@ -3,6 +3,11 @@ package int0x191f2.mediamaid;
 import android.content.Intent;
 import android.media.Image;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +26,8 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
+import android.text.TextPaint;
+import android.graphics.Color;
 
 /**
  * Created by ip4gjb on 7/7/15.
@@ -82,7 +90,8 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         twatter = tf.getInstance();
         final Long id = Long.valueOf(dataset.get(position).getTweetID()).longValue();
 
-        Log.i("MediaMaid","Loading item with index: "+position);
+        Log.i("MediaMaid", "Loading item with index: " + position);
+
 
         if(dataset.get(position).getIsRetweetByMe()) {
             holder.actionRetweet.setImageResource(R.drawable.ic_retweet_true);
@@ -92,7 +101,21 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
         holder.userName.setText("@"+dataset.get(position).getUserName());
         holder.tweetID.setText(dataset.get(position).getTweetID());
         holder.tweetDate.setText(dataset.get(position).getTweetDate());
-        holder.tweetPayload.setText(dataset.get(position).getTweetPayload());
+
+        holder.tweetPayload.setMovementMethod(LinkMovementMethod.getInstance());
+
+        SpannableString spannableString=new SpannableString(dataset.get(position).getTweetPayload());
+        String payload=dataset.get(position).getTweetPayload();
+        String tweetArray[]=payload.split(" ");
+        for(String a : tweetArray){
+            if(a.startsWith("@")){
+                spannableString.setSpan(new UserSpan(a.substring(1).replaceAll("[-+.^:,]", "")),
+                        payload.indexOf(a),
+                        payload.indexOf(a)+a.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+        holder.tweetPayload.setText(spannableString);
 
         //Check if the tweet is on the timeline because it was retweeted
         if(dataset.get(position).getIsRetweet()){
@@ -192,5 +215,29 @@ public class TwitterTimelineViewAdapter extends RecyclerView.Adapter<TwitterTime
     @Override
     public int getItemCount() {
         return dataset.size();
+    }
+
+    class UserSpan extends ClickableSpan{
+        String text;
+        UserSpan(String text){
+            this.text=text;
+        }
+        public void onClick(View textView){
+            try {
+                MediaMaidConfigurationBuilder.resetInstance();
+                Twitter twitter = new TwitterFactory(MediaMaidConfigurationBuilder.getInstance().configurationBuilder.build()).getInstance();
+                Intent intent = new Intent(textView.getContext(), TwitterProfileViewActivity.class);
+                intent.putExtra("userhandle", this.text);
+                intent.putExtra("username", twitter.showUser(this.text).getName());
+                textView.getContext().startActivity(intent);
+            }catch (Exception e){
+                Log.e("MediaMaid","Error loading user");
+            }
+        }
+        @Override
+        public void updateDrawState(TextPaint ds){
+            ds.setColor(Color.BLUE);
+            ds.setUnderlineText(false);
+        }
     }
 }
